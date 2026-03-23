@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compatibility Reading — Born Decoded</title>
+  <meta name="description" content="Discover your relationship dynamics with an AI-powered Korean Saju compatibility reading. Two charts, one truth.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="images/profile.png">
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-inner">
+    <a href="/" class="header-logo">
+      <img src="images/profile.png" alt="Born Decoded">
+      <span>Born Decoded</span>
+    </a>
+    <nav class="header-nav">
+      <a href="saju.html" class="btn btn-outline btn-sm">Saju · $5</a>
+    </nav>
+  </div>
+</header>
+
+<div class="form-page">
+  <div class="form-header">
+    <h1>Compatibility Reading</h1>
+    <p class="price">$5 &middot; 12–15 page PDF report</p>
+  </div>
+
+  <form id="compatForm" class="form-card" novalidate>
+
+    <!-- Section 1: Your Birth Details -->
+    <div class="form-section">
+      <h2 class="form-section-title">Your Birth Details</h2>
+
+      <div class="form-group">
+        <label class="form-label">Full Name <span class="required">*</span></label>
+        <input type="text" name="person1Name" class="form-input" placeholder="Your name" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date of Birth <span class="required">*</span></label>
+        <div class="form-row-3">
+          <select name="person1BirthYear" class="form-select birth-year" required><option value="">Year</option></select>
+          <select name="person1BirthMonth" class="form-select birth-month" required><option value="">Month</option></select>
+          <select name="person1BirthDay" class="form-select birth-day" required><option value="">Day</option></select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Birth Time</label>
+        <div class="form-row">
+          <select name="person1BirthHour" class="form-select birth-hour"><option value="">Hour</option></select>
+          <select name="person1BirthMinute" class="form-select birth-minute"><option value="">Minute</option></select>
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;margin-top:8px;cursor:pointer;">
+          <input type="checkbox" class="no-time-check" data-target="person1" style="accent-color:var(--gold);">
+          <span style="font-size:0.82rem;color:var(--brown-light);">I don't know my birth time</span>
+        </label>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Birth City <span class="required">*</span></label>
+        <input type="text" name="person1BirthCity" class="form-input" placeholder="e.g. New York, NY, USA" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Gender <span class="required">*</span></label>
+        <div class="radio-group">
+          <div class="radio-pill"><input type="radio" name="person1Gender" id="p1g-male" value="male" required><label for="p1g-male">Male</label></div>
+          <div class="radio-pill"><input type="radio" name="person1Gender" id="p1g-female" value="female"><label for="p1g-female">Female</label></div>
+          <div class="radio-pill"><input type="radio" name="person1Gender" id="p1g-nb" value="non-binary"><label for="p1g-nb">Non-binary</label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Their Birth Details -->
+    <div class="form-section">
+      <h2 class="form-section-title">Their Birth Details</h2>
+
+      <div class="form-group">
+        <label class="form-label">Their Name <span class="required">*</span></label>
+        <input type="text" name="person2Name" class="form-input" placeholder="Partner's name or nickname" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date of Birth <span class="required">*</span></label>
+        <div class="form-row-3">
+          <select name="person2BirthYear" class="form-select birth-year" required><option value="">Year</option></select>
+          <select name="person2BirthMonth" class="form-select birth-month" required><option value="">Month</option></select>
+          <select name="person2BirthDay" class="form-select birth-day" required><option value="">Day</option></select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Birth Time</label>
+        <div class="form-row">
+          <select name="person2BirthHour" class="form-select birth-hour"><option value="">Hour</option></select>
+          <select name="person2BirthMinute" class="form-select birth-minute"><option value="">Minute</option></select>
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;margin-top:8px;cursor:pointer;">
+          <input type="checkbox" class="no-time-check" data-target="person2" style="accent-color:var(--gold);">
+          <span style="font-size:0.82rem;color:var(--brown-light);">I don't know their birth time</span>
+        </label>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Birth City <span class="required">*</span></label>
+        <input type="text" name="person2BirthCity" class="form-input" placeholder="e.g. Los Angeles, CA, USA" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Gender <span class="required">*</span></label>
+        <div class="radio-group">
+          <div class="radio-pill"><input type="radio" name="person2Gender" id="p2g-male" value="male" required><label for="p2g-male">Male</label></div>
+          <div class="radio-pill"><input type="radio" name="person2Gender" id="p2g-female" value="female"><label for="p2g-female">Female</label></div>
+          <div class="radio-pill"><input type="radio" name="person2Gender" id="p2g-nb" value="non-binary"><label for="p2g-nb">Non-binary</label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Relationship Type -->
+    <div class="form-section">
+      <h2 class="form-section-title">About Your Relationship</h2>
+      <div class="form-group">
+        <label class="form-label">Relationship Type <span class="required">*</span></label>
+        <div class="radio-group">
+          <div class="radio-pill"><input type="radio" name="relationshipType" id="rt-romantic" value="romantic" required><label for="rt-romantic">Romantic Partner</label></div>
+          <div class="radio-pill"><input type="radio" name="relationshipType" id="rt-spouse" value="spouse"><label for="rt-spouse">Spouse</label></div>
+          <div class="radio-pill"><input type="radio" name="relationshipType" id="rt-crush" value="crush"><label for="rt-crush">Crush</label></div>
+          <div class="radio-pill"><input type="radio" name="relationshipType" id="rt-friend" value="friend"><label for="rt-friend">Friend</label></div>
+          <div class="radio-pill"><input type="radio" name="relationshipType" id="rt-family" value="family"><label for="rt-family">Family</label></div>
+          <div class="radio-pill"><input type="radio" name="relationshipType" id="rt-business" value="business"><label for="rt-business">Business Partner</label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 4: Questions -->
+    <div class="form-section">
+      <h2 class="form-section-title">Your Questions <span style="font-weight:400;font-size:0.85rem;opacity:0.6;">(optional, up to 2)</span></h2>
+      <div class="form-group">
+        <label class="form-label">Question 1</label>
+        <input type="text" name="question1" class="form-input" placeholder="e.g. Are we soulmates?">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Question 2</label>
+        <input type="text" name="question2" class="form-input" placeholder="e.g. How can we improve our relationship?">
+      </div>
+    </div>
+
+    <!-- Section 5: Email + Agreements -->
+    <div class="form-section">
+      <h2 class="form-section-title">Your Email</h2>
+      <div class="form-group">
+        <label class="form-label">Email Address <span class="required">*</span></label>
+        <input type="email" name="email" class="form-input" placeholder="you@example.com" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirm Email <span class="required">*</span></label>
+        <input type="email" name="emailConfirm" class="form-input" placeholder="Confirm your email" required>
+        <p class="form-error" id="emailError">Email addresses don't match</p>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2 class="form-section-title">Agreements</h2>
+      <div class="checkbox-group">
+        <label class="checkbox-item">
+          <input type="checkbox" name="agreeEntertainment" required>
+          <span>I understand this reading is for entertainment and self-reflection purposes only.</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" name="agreeRefund" required>
+          <span>I understand that no refunds will be issued after purchase.</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div class="form-submit">
+      <button type="submit" class="btn btn-gold btn-lg disabled" id="submitBtn" disabled>
+        Pay $5 — Get Your Compatibility Reading &rarr;
+      </button>
+      <p id="formMessage" style="margin-top:12px;font-size:0.85rem;display:none;"></p>
+    </div>
+
+  </form>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-logo">
+      <img src="images/profile.png" alt="Born Decoded">
+      <span>Born Decoded</span>
+    </div>
+    <div class="footer-links">
+      <a href="terms.html">Terms of Service</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="refund.html">Refund Policy</a>
+    </div>
+    <p class="footer-disclaimer">Readings are for entertainment and self-reflection purposes only.</p>
+    <p class="footer-copy">&copy; 2026 Born Decoded. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script src="js/compatibility-form.js"></script>
+</body>
+</html>
