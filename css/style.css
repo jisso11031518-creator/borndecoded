@@ -102,7 +102,8 @@ a { color: inherit; text-decoration: none; }
   background: rgba(245, 237, 228, 0.92);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(201,169,110,0.12);
-  height: 64px;
+  height: 72px;
+  padding-top: 6px;
   display: flex;
   align-items: center;
 }
@@ -127,6 +128,12 @@ a { color: inherit; text-decoration: none; }
 .header-logo img { width: 36px; height: 36px; border-radius: 50%; }
 .header-nav { display: flex; gap: 8px; }
 .header-nav .btn { padding: 8px 20px; font-size: 0.85rem; }
+.header-nav .btn-nav {
+  background: #E8DDD2;
+  color: var(--dark);
+  border: 1.5px solid rgba(201,169,110,0.3);
+}
+.header-nav .btn-nav:hover { background: #ddd0c3; color: var(--dark); }
 
 /* ---------- Hero ---------- */
 .hero {
@@ -172,6 +179,12 @@ a { color: inherit; text-decoration: none; }
   margin-bottom: 16px;
   font-weight: 500;
 }
+.hero-buttons .btn-cta {
+  background: #E8DDD2;
+  color: var(--dark);
+  border: 1.5px solid rgba(201,169,110,0.3);
+}
+.hero-buttons .btn-cta:hover { background: #ddd0c3; color: var(--dark); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(201,169,110,0.2); }
 .hero h1 {
   font-family: var(--font-serif);
   font-size: 2.4rem;
@@ -211,7 +224,7 @@ a { color: inherit; text-decoration: none; }
 }
 .section-dark .section-title h2 { color: var(--ivory); }
 .section-title p {
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: var(--brown-light);
   opacity: 0.7;
 }
@@ -263,7 +276,7 @@ a { color: inherit; text-decoration: none; }
   font-weight: 600;
   margin-bottom: 8px;
 }
-.step-card p { font-size: 0.875rem; color: var(--brown-light); opacity: 0.7; }
+.step-card p { font-size: 0.9375rem; color: var(--brown-light); opacity: 0.7; }
 
 /* ---------- Product Cards ---------- */
 .products-grid {
@@ -299,7 +312,7 @@ a { color: inherit; text-decoration: none; }
 }
 .product-features { list-style: none; margin-bottom: 28px; flex: 1; }
 .product-features li {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: var(--brown);
   padding: 5px 0;
   display: flex;
@@ -377,7 +390,7 @@ a { color: inherit; text-decoration: none; }
   border: none;
   cursor: pointer;
   font-family: var(--font-sans);
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 500;
   color: var(--brown);
   text-align: left;
@@ -400,7 +413,7 @@ a { color: inherit; text-decoration: none; }
 .faq-item.open .faq-answer { max-height: 300px; }
 .faq-answer-inner {
   padding: 0 20px 18px;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: var(--brown-light);
   opacity: 0.75;
   line-height: 1.7;
@@ -529,6 +542,15 @@ a { color: inherit; text-decoration: none; }
   transition: opacity 0.2s;
 }
 .footer-yt:hover { opacity: 1; }
+.footer-biz {
+  font-size: 0.7rem;
+  opacity: 0.35;
+  margin-top: 16px;
+  line-height: 1.7;
+}
+.footer-biz span { display: inline; }
+.footer-biz br { display: none; }
+@media (max-width: 640px) { .footer-biz br { display: block; } }
 
 /* ---------- Form Pages ---------- */
 .form-page {
@@ -726,7 +748,7 @@ a { color: inherit; text-decoration: none; }
   color: var(--brown);
 }
 .legal-card p, .legal-card li {
-  font-size: 0.9rem;
+  font-size: 0.9375rem;
   color: var(--brown-light);
   line-height: 1.8;
   margin-bottom: 12px;
