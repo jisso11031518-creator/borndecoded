@@ -1,0 +1,24 @@
+{
+  "functions": {
+    "api/webhook.js": { "maxDuration": 300 },
+    "api/generate-report.js": { "maxDuration": 300 },
+    "api/test-generate.js": { "maxDuration": 300 },
+    "api/retry-failed.js": { "maxDuration": 300 }
+  },
+  "crons": [
+    {
+      "path": "/api/retry-failed",
+      "schedule": "*/10 * * * *"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "POST, GET, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, x-test-secret" }
+      ]
+    }
+  ]
+}
