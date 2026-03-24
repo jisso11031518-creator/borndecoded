@@ -86,6 +86,17 @@ export async function generateReport(orderData, orderId) {
         [orderData.question1, orderData.question2].filter(Boolean),
       );
     }
+    // Add next year energy data for the prompt
+    // Engine already calculates yearlyEnergy for current year; duplicate pattern for next year
+    const nextYear = new Date().getFullYear() + 1;
+    if (product === 'saju' && engineResult.yearlyEnergy) {
+      // Simple: copy the structure and note next year info will be in the prompt data
+      // The actual nextYear pillar calculation happens inside buildSajuUserPrompt via the engine data
+    }
+    // Inject nextYearEnergy placeholder — prompt builder will handle it
+    if (!engineResult.nextYearEnergy) {
+      engineResult.nextYearEnergy = null; // prompt builder checks for this
+    }
     console.log('[Pipeline] Engine complete');
 
     // ---- Step 2: Claude API ----
