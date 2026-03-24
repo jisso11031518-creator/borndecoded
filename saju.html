@@ -7,6 +7,9 @@
   <meta name="description" content="Get your personal AI-powered Korean Saju reading. Enter your birth details and receive a 15-20 page PDF report.">
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" href="images/profile.png">
+  <!-- GA4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-XXXXXXXXXX');</script>
 </head>
 <body>
 
@@ -73,7 +76,9 @@
 
       <div class="form-group">
         <label class="form-label">Birth City <span class="required">*</span></label>
-        <input type="text" name="birthCity" class="form-input" placeholder="e.g. New York, NY, USA" required>
+        <input type="text" name="birthCity" id="birthCityInput" class="form-input" placeholder="Start typing a city..." autocomplete="off" required>
+        <input type="hidden" name="longitude" id="longitude">
+        <input type="hidden" name="timezone" id="timezone">
       </div>
 
       <div class="form-group">
@@ -165,6 +170,7 @@
         <input type="email" name="emailConfirm" class="form-input" placeholder="Confirm your email" required>
         <p class="form-error" id="emailError">Email addresses don't match</p>
       </div>
+      <p style="font-size:0.78rem;color:var(--brown-light);opacity:0.6;margin-top:8px;">By purchasing, you agree to receive your reading via email.</p>
     </div>
 
     <!-- Section 5: Agreements -->
@@ -212,6 +218,7 @@
   </div>
 </footer>
 
+<script src="https://maps.googleapis.com/maps/api/js?key=GOOGLE_MAPS_API_KEY_HERE&libraries=places" async defer></script>
 <script src="js/main.js"></script>
 <script src="js/saju-form.js"></script>
 </body>

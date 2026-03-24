@@ -1,9 +1,7 @@
 /**
  * Born Decoded — Compatibility Form Logic
- * Populates dropdowns, validates, submits to n8n webhook
+ * Google Places Autocomplete (2 cities) + validation + submit to /api/compatibility-order
  */
-
-const N8N_WEBHOOK_URL = ''; // Set your n8n webhook base URL here
 
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('compatForm');
@@ -42,7 +40,61 @@ document.addEventListener('DOMContentLoaded', () => {
         s.value = '';
         s.style.opacity = cb.checked ? '0.4' : '1';
       });
+      validateForm();
     });
+  });
+
+  // ---- Google Places Autocomplete (2 cities) ----
+  const geoData = {
+    person1: { longitude: null, timezone: null },
+    person2: { longitude: null, timezone: null },
+  };
+
+  function initAutocomplete() {
+    if (typeof google === 'undefined' || !google.maps?.places) {
+      setTimeout(initAutocomplete, 500);
+      return;
+    }
+
+    ['person1', 'person2'].forEach(person => {
+      const input = document.getElementById(`${person}CityInput`);
+      const autocomplete = new google.maps.places.Autocomplete(input, {
+        types: ['(cities)'],
+        fields: ['geometry', 'utc_offset_minutes', 'formatted_address'],
+      });
+
+      autocomplete.addListener('place_changed', () => {
+        const place = autocomplete.getPlace();
+        if (place.geometry) {
+          const lng = place.geometry.location.lng();
+          geoData[person].longitude = lng;
+          geoData[person].timezone = place.utc_offset_minutes !== undefined
+            ? utcOffsetToTimezone(place.utc_offset_minutes, place.formatted_address)
+            : guessTimezone(lng);
+
+          document.getElementById(`${person}Longitude`).value = geoData[person].longitude;
+          document.getElementById(`${person}Timezone`).value = geoData[person].timezone;
+        }
+        validateForm();
+      });
+
+      input.addEventListener('input', () => {
+        geoData[person] = { longitude: null, timezone: null };
+        document.getElementById(`${person}Longitude`).value = '';
+        document.getElementById(`${person}Timezone`).value = '';
+        validateForm();
+      });
+    });
+  }
+  initAutocomplete();
+
+  // ---- GA4 Event: form_start ----
+  let formStarted = false;
+  form.addEventListener('focusin', () => {
+    if (!formStarted && typeof gtag === 'function') {
+      gtag('event', 'form_start', { form_name: 'compatibility' });
+      formStarted = true;
+    }
   });
 
   // ---- Validate ----
@@ -55,6 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const p1month = form.person1BirthMonth.value;
     const p1day = form.person1BirthDay.value;
     const p1city = form.person1BirthCity.value.trim();
+    const p1geo = geoData.person1.longitude !== null;
     const p1gender = form.person1Gender.value;
 
     const p2name = form.person2Name.value.trim();
@@ -62,6 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const p2month = form.person2BirthMonth.value;
     const p2day = form.person2BirthDay.value;
     const p2city = form.person2BirthCity.value.trim();
+    const p2geo = geoData.person2.longitude !== null;
     const p2gender = form.person2Gender.value;
 
     const relType = getRadioValue(form, 'relationshipType');
@@ -74,8 +128,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const emailsDontMatch = email && emailConfirm && email !== emailConfirm;
     emailError.classList.toggle('show', emailsDontMatch);
 
-    const valid = p1name && p1year && p1month && p1day && p1city && p1gender &&
-                  p2name && p2year && p2month && p2day && p2city && p2gender &&
+    const valid = p1name && p1year && p1month && p1day && p1city && p1geo && p1gender &&
+                  p2name && p2year && p2month && p2day && p2city && p2geo && p2gender &&
                   relType && emailsMatch && agree1 && agree2;
 
     submitBtn.disabled = !valid;
@@ -85,6 +139,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // ---- Submit ----
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    if (typeof gtag === 'function') gtag('event', 'form_submit', { form_name: 'compatibility' });
 
     const p1noTime = form.querySelector('.no-time-check[data-target="person1"]').checked;
     const p2noTime = form.querySelector('.no-time-check[data-target="person2"]').checked;
@@ -100,6 +156,8 @@ document.addEventListener('DOMContentLoaded', () => {
         birthMinute: p1noTime ? null : (form.person1BirthMinute.value ? parseInt(form.person1BirthMinute.value) : 0),
         birthTimeUnknown: p1noTime,
         birthCity: form.person1BirthCity.value.trim(),
+        longitude: parseFloat(document.getElementById('person1Longitude').value),
+        timezone: document.getElementById('person1Timezone').value,
         gender: form.person1Gender.value,
       },
       person2: {
@@ -111,6 +169,8 @@ document.addEventListener('DOMContentLoaded', () => {
         birthMinute: p2noTime ? null : (form.person2BirthMinute.value ? parseInt(form.person2BirthMinute.value) : 0),
         birthTimeUnknown: p2noTime,
         birthCity: form.person2BirthCity.value.trim(),
+        longitude: parseFloat(document.getElementById('person2Longitude').value),
+        timezone: document.getElementById('person2Timezone').value,
         gender: form.person2Gender.value,
       },
       relationshipType: getRadioValue(form, 'relationshipType'),
@@ -124,28 +184,26 @@ document.addEventListener('DOMContentLoaded', () => {
     formMessage.style.display = 'none';
 
     try {
-      if (!N8N_WEBHOOK_URL) {
-        console.log('Compatibility order payload:', payload);
-        window.location.href = 'success.html';
-        return;
-      }
-
-      const res = await fetch(`${N8N_WEBHOOK_URL}/compatibility-order`, {
+      const res = await fetch('/api/compatibility-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error('Server error');
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Server error');
+      }
+
       const data = await res.json();
 
-      if (data.stripe_url) {
-        window.location.href = data.stripe_url;
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
       } else {
         window.location.href = 'success.html';
       }
     } catch (err) {
-      formMessage.textContent = 'Something went wrong. Please try again.';
+      formMessage.textContent = err.message || 'Something went wrong. Please try again.';
       formMessage.style.color = 'var(--fire)';
       formMessage.style.display = 'block';
       submitBtn.disabled = false;
@@ -157,4 +215,22 @@ document.addEventListener('DOMContentLoaded', () => {
 function getRadioValue(form, name) {
   const el = form.querySelector(`input[name="${name}"]:checked`);
   return el ? el.value : '';
+}
+
+function utcOffsetToTimezone(offsetMinutes, address) {
+  const addr = (address || '').toLowerCase();
+  if (addr.includes('korea')) return 'Asia/Seoul';
+  if (addr.includes('japan') || addr.includes('tokyo')) return 'Asia/Tokyo';
+  if (addr.includes('australia') || addr.includes('sydney')) return offsetMinutes === 600 ? 'Australia/Sydney' : 'Australia/Perth';
+  if (addr.includes('london') || addr.includes('united kingdom')) return 'Europe/London';
+  const hours = offsetMinutes / 60;
+  const US_MAP = { '-5': 'America/New_York', '-6': 'America/Chicago', '-7': 'America/Denver', '-8': 'America/Los_Angeles' };
+  if (US_MAP[String(hours)]) return US_MAP[String(hours)];
+  try { return Intl.DateTimeFormat().resolvedOptions().timeZone; } catch (e) {}
+  return `UTC${hours >= 0 ? '+' : ''}${hours}`;
+}
+
+function guessTimezone(longitude) {
+  const offset = Math.round(longitude / 15);
+  return `UTC${offset >= 0 ? '+' : ''}${offset}`;
 }
