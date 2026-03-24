@@ -110,7 +110,8 @@ export async function generateReport(orderData, orderId) {
     // ---- Step 5: Generate PDF ----
     let pdfBuffer;
     if (product === 'saju') {
-      const birthDate = `${orderData.birthYear}-${String(orderData.birthMonth).padStart(2, '0')}-${String(orderData.birthDay).padStart(2, '0')}`;
+      const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      const birthDate = `${MONTHS[orderData.birthMonth - 1]} ${orderData.birthDay}, ${orderData.birthYear}`;
       pdfBuffer = await generateSajuPdf({
         report,
         coverImageBuffer,
