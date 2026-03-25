@@ -54,7 +54,7 @@ export async function generateReport(orderData, orderId) {
           relationship: orderData.contextRelationship || '',
           career: orderData.contextCareer || '',
         },
-        freeQuestions: [orderData.question1, orderData.question2, orderData.question3].filter(Boolean),
+        freeQuestions: backfillQuestions([orderData.question1, orderData.question2, orderData.question3]),
       });
     } else {
       engineResult = runCompatibilityEngine(
@@ -252,6 +252,22 @@ async function callGptFallback(engineResult, product) {
 }
 
 // ---- Helpers ----
+const DEFAULT_QUESTIONS = [
+  'What does this year hold for me?',
+  'What career path suits me best?',
+  'What should I know about my love life?',
+];
+
+function backfillQuestions(raw) {
+  const filled = (raw || []).filter(Boolean);
+  let i = 0;
+  while (filled.length < 3 && i < DEFAULT_QUESTIONS.length) {
+    if (!filled.includes(DEFAULT_QUESTIONS[i])) filled.push(DEFAULT_QUESTIONS[i]);
+    i++;
+  }
+  return filled;
+}
+
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 async function retryAsync(fn, maxRetries, delayMs) {
