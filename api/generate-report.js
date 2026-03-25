@@ -241,6 +241,7 @@ async function callGptFallback(engineResult, product) {
     body: JSON.stringify({
       model: 'gpt-4o',
       max_tokens: 10000,
+      temperature: 0.7,
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
