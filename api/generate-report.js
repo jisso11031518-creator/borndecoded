@@ -15,7 +15,7 @@ import {
   COMPATIBILITY_SYSTEM_PROMPT,
 } from '../lib/report-prompt.mjs';
 import { generateCoverImage, generateBodyImage } from '../lib/gemini-image-client.mjs';
-import { generateSajuPdf, generateCompatibilityPdf } from '../lib/pdf-generator.mjs';
+import { generateSajuPdf, generateCompatibilityPdf, getCleanCjkCount } from '../lib/pdf-generator.mjs';
 import { sendReportEmail, sendPreparingEmail } from '../lib/email-sender.mjs';
 import { notifySuccess, notifyFailure } from '../lib/telegram.mjs';
 import { saveFailedOrder, markCompleted } from '../lib/error-handler.mjs';
@@ -142,6 +142,15 @@ export async function generateReport(orderData, orderId) {
       });
     }
     console.log(`[Pipeline] PDF generated (${Math.round(pdfBuffer.length / 1024)}KB)`);
+
+    // ---- Step 5b: QA check — warn if CJK characters were stripped ----
+    const cjkStripped = getCleanCjkCount();
+    if (cjkStripped > 0) {
+      console.warn(`[Pipeline] QA WARNING: ${cjkStripped} CJK characters stripped from report`);
+      try {
+        await notifyFailure(customerName, `QA WARNING: ${cjkStripped} CJK chars stripped in PDF. Report sent but may have blank terms.`, orderId, email);
+      } catch (_) { /* non-blocking */ }
+    }
 
     // ---- Step 6: Send Email (with retry) ----
     await retryAsync(() => sendReportEmail(email, customerName, product, pdfBuffer), 3, 2000);
