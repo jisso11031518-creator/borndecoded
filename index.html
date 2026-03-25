@@ -123,22 +123,26 @@
     <div class="gold-line"></div>
   </div>
   <div class="samples-grid">
-    <div class="sample-card">
+    <div class="sample-card" onclick="openLightbox(0)">
       <img class="sample-img" src="images/sample-cover.png" alt="Sample cover page" loading="lazy">
       <div class="sample-label">Cover Page</div>
     </div>
-    <div class="sample-card">
+    <div class="sample-card" onclick="openLightbox(1)">
       <img class="sample-img" src="images/sample-intro.png" alt="Sample intro page" loading="lazy">
-      <div class="sample-label">Your Birth Chart</div>
+      <div class="sample-label">Your Reading</div>
     </div>
-    <div class="sample-card">
+    <div class="sample-card" onclick="openLightbox(2)">
       <img class="sample-img" src="images/sample-qa.png" alt="Sample Q&A page" loading="lazy">
-      <div class="sample-label">Your Questions Answered</div>
+      <div class="sample-label">Q&A Section</div>
     </div>
-    <div class="sample-card">
-      <img class="sample-img" src="images/sample-guide.png" alt="Sample survival guide page" loading="lazy">
-      <div class="sample-label">Your Survival Guide</div>
-    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div id="lightbox" class="lb-overlay" onclick="closeLightbox(event)">
+    <button class="lb-close" onclick="closeLightbox(event)">&times;</button>
+    <button class="lb-arrow lb-prev" onclick="lbNav(event,-1)">&#8249;</button>
+    <img id="lb-img" class="lb-img" src="" alt="Sample page">
+    <button class="lb-arrow lb-next" onclick="lbNav(event,1)">&#8250;</button>
   </div>
 </section>
 
@@ -295,5 +299,20 @@
 </footer>
 
 <script src="js/main.js"></script>
+<script>
+const lbImages = ['images/sample-cover.png','images/sample-intro.png','images/sample-qa.png'];
+let lbIdx = 0;
+const lbEl = document.getElementById('lightbox');
+const lbImg = document.getElementById('lb-img');
+function openLightbox(i) { lbIdx = i; lbImg.src = lbImages[i]; lbEl.classList.add('active'); }
+function closeLightbox(e) { if (e.target === lbEl || e.target.classList.contains('lb-close')) lbEl.classList.remove('active'); }
+function lbNav(e, dir) { e.stopPropagation(); lbIdx = (lbIdx + dir + lbImages.length) % lbImages.length; lbImg.src = lbImages[lbIdx]; }
+document.addEventListener('keydown', function(e) {
+  if (!lbEl.classList.contains('active')) return;
+  if (e.key === 'Escape') lbEl.classList.remove('active');
+  if (e.key === 'ArrowLeft') lbNav(e, -1);
+  if (e.key === 'ArrowRight') lbNav(e, 1);
+});
+</script>
 </body>
 </html>
