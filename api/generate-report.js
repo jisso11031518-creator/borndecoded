@@ -154,6 +154,7 @@ export async function generateReport(orderData, orderId) {
         person1Name: orderData.person1.name,
         person2Name: orderData.person2.name,
         birthDate,
+        engineData: engineResult,
       });
     }
     console.log(`[Pipeline] PDF generated (${Math.round(pdfBuffer.length / 1024)}KB)`);
