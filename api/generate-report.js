@@ -30,7 +30,7 @@ const GPT_API_URL = 'https://api.openai.com/v1/chat/completions';
  */
 export async function generateReport(orderData, orderId) {
   const { product, email } = orderData;
-  const customerName = product === 'compatibility' ? orderData.person1.name : orderData.name;
+  const customerName = product === 'compatibility' ? `${orderData.person1.name} & ${orderData.person2.name}` : orderData.name;
 
   try {
     console.log(`[Pipeline] Starting ${product} report for ${customerName}`);
