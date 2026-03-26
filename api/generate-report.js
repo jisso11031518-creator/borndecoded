@@ -138,6 +138,7 @@ export async function generateReport(orderData, orderId) {
         bodyImageBuffer,
         name: orderData.name,
         birthDate,
+        engineData: engineResult,
       });
     } else {
       const birthDate = `${orderData.person1.name} & ${orderData.person2.name}`;
