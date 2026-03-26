@@ -340,8 +340,8 @@ a { color: inherit; text-decoration: none; }
   background: white;
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid rgba(201,169,110,0.1);
-  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  border: 1px solid #C5A55A;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
   cursor: pointer;
   transition: transform 0.3s;
 }
