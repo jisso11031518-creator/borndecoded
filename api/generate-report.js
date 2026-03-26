@@ -17,7 +17,7 @@ import {
 import { generateCoverImage, generateBodyImage } from '../lib/gemini-image-client.mjs';
 import { generateSajuPdf, generateCompatibilityPdf, getCleanCjkCount } from '../lib/pdf-generator.mjs';
 import { sendReportEmail, sendPreparingEmail } from '../lib/email-sender.mjs';
-import { notifySuccess, notifyFailure } from '../lib/telegram.mjs';
+import { notifySuccess, notifyFailure, notifyQaWarning } from '../lib/telegram.mjs';
 import { saveFailedOrder, markCompleted } from '../lib/error-handler.mjs';
 
 const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
@@ -148,7 +148,7 @@ export async function generateReport(orderData, orderId) {
     if (cjkStripped > 0) {
       console.warn(`[Pipeline] QA WARNING: ${cjkStripped} CJK characters stripped from report`);
       try {
-        await notifyFailure(customerName, `QA WARNING: ${cjkStripped} CJK chars stripped in PDF. Report sent but may have blank terms.`, orderId, email);
+        await notifyQaWarning(customerName, `${cjkStripped} CJK chars stripped in PDF. Report sent but may have blank terms.`, orderId, email);
       } catch (_) { /* non-blocking */ }
     }
 
