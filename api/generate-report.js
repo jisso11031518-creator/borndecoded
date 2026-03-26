@@ -15,9 +15,9 @@ import {
   COMPATIBILITY_SYSTEM_PROMPT,
 } from '../lib/report-prompt.mjs';
 import { generateCoverImage, generateBodyImage } from '../lib/gemini-image-client.mjs';
-import { generateSajuPdf, generateCompatibilityPdf, getCleanCjkCount, checkSafetyViolations } from '../lib/pdf-generator.mjs';
+import { generateSajuPdf, generateCompatibilityPdf, getCleanCjkCount, sanitizeSafetyViolations } from '../lib/pdf-generator.mjs';
 import { sendReportEmail, sendPreparingEmail } from '../lib/email-sender.mjs';
-import { notifySuccess, notifyFailure, notifyQaWarning, notifySafetyBlock } from '../lib/telegram.mjs';
+import { notifySuccess, notifyFailure, notifyQaWarning, notifySafetyReplace } from '../lib/telegram.mjs';
 import { saveFailedOrder, markCompleted } from '../lib/error-handler.mjs';
 
 const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
@@ -110,14 +110,13 @@ export async function generateReport(orderData, orderId) {
       console.log('[Pipeline] GPT-4o fallback complete');
     }
 
-    // ---- Step 2b: Safety check ----
-    const reportText = JSON.stringify(report);
-    const safetyViolations = checkSafetyViolations(reportText);
-    if (safetyViolations.length > 0) {
-      console.error(`[Pipeline] SAFETY BLOCK: ${safetyViolations.join(', ')}`);
-      await notifySafetyBlock(customerName, safetyViolations, orderId, email);
-      return { success: false, error: `Safety violation detected: ${safetyViolations.join(', ')}` };
+    // ---- Step 2b: Safety auto-replace ----
+    const { report: safeReport, replaced: safetyReplaced } = sanitizeSafetyViolations(report);
+    if (safetyReplaced.length > 0) {
+      console.warn(`[Pipeline] SAFETY: replaced ${safetyReplaced.length} expressions: ${safetyReplaced.join(', ')}`);
+      try { await notifySafetyReplace(customerName, safetyReplaced, orderId, email); } catch (_) {}
     }
+    report = safeReport;
     console.log('[Pipeline] Safety check passed');
 
     // ---- Step 3: Gemini Cover Image ----
