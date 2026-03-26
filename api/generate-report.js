@@ -117,6 +117,11 @@ export async function generateReport(orderData, orderId) {
       try { await notifySafetyReplace(customerName, safetyReplaced, orderId, email); } catch (_) {}
     }
     report = safeReport;
+    // Compatibility section number migration (old→new fallback)
+    if (product === 'compatibility') {
+      if (!report.section10_questions && report.section9_questions) report.section10_questions = report.section9_questions;
+      if (!report.section11_coupleGuide && report.section10_coupleGuide) report.section11_coupleGuide = report.section10_coupleGuide;
+    }
     console.log('[Pipeline] Safety check passed');
 
     // ---- Step 3: Gemini Cover Image ----
