@@ -97,12 +97,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const emailConfirm = form.emailConfirm.value.trim();
     const agree1 = form.agreeEntertainment.checked;
     const agree2 = form.agreeRefund.checked;
+    const agree3 = form.agreeTerms?.checked;
 
     const emailsMatch = email && emailConfirm && email === emailConfirm;
     const emailsDontMatch = email && emailConfirm && email !== emailConfirm;
     emailError.classList.toggle('show', emailsDontMatch);
 
-    const valid = name && year && month && day && city && hasGeo && gender && emailsMatch && agree1 && agree2;
+    const valid = name && year && month && day && city && hasGeo && gender && emailsMatch && agree1 && agree2 && agree3;
     submitBtn.disabled = !valid;
     submitBtn.classList.toggle('disabled', !valid);
   }
@@ -131,6 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
       gender: form.gender.value,
       contextRelationship: getRadioValue(form, 'contextRelationship'),
       contextCareer: getRadioValue(form, 'contextCareer'),
+      contextJob: (form.contextJob?.value || '').trim(),
       contextCurious: getRadioValue(form, 'contextCurious'),
       question1: form.question1.value.trim(),
       question2: form.question2.value.trim(),
@@ -166,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
       formMessage.style.color = 'var(--fire)';
       formMessage.style.display = 'block';
       submitBtn.disabled = false;
-      submitBtn.textContent = 'Pay $5 — Get Your Reading →';
+      submitBtn.textContent = 'Pay $9.99 — Get Your Reading →';
     }
   });
 });

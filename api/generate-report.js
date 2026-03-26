@@ -19,6 +19,7 @@ import { generateSajuPdf, generateCompatibilityPdf, sanitizeSafetyViolations } f
 import { sendReportEmail, sendPreparingEmail } from '../lib/email-sender.mjs';
 import { notifySuccess, notifyFailure, notifySafetyReplace } from '../lib/telegram.mjs';
 import { saveFailedOrder, markCompleted } from '../lib/error-handler.mjs';
+import { logOrder } from '../lib/supabase.mjs';
 
 const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
 const GPT_API_URL = 'https://api.openai.com/v1/chat/completions';
@@ -53,6 +54,7 @@ export async function generateReport(orderData, orderId) {
           gender: orderData.gender,
           relationship: orderData.contextRelationship || '',
           career: orderData.contextCareer || '',
+          job: orderData.contextJob || '',
         },
         freeQuestions: backfillQuestions([orderData.question1, orderData.question2, orderData.question3]),
       });
@@ -163,9 +165,12 @@ export async function generateReport(orderData, orderId) {
     await retryAsync(() => sendReportEmail(email, customerName, product, pdfBuffer), 3, 2000);
     console.log('[Pipeline] Email sent');
 
-    // ---- Step 7: Mark completed + notify ----
+    // ---- Step 7: Mark completed + notify + log ----
     await markCompleted(orderId);
     await notifySuccess(customerName, product, email);
+    // Supabase transaction log (non-blocking)
+    const amount = product === 'compatibility' ? 12.99 : 9.99;
+    try { await logOrder({ orderId, customerName, customerEmail: email, productType: product, amount }); } catch (_) {}
     console.log('[Pipeline] Complete!');
 
     return { success: true };
