@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
       },
 
       onApprove: async (data) => {
-        formMessage.textContent = 'Payment complete! Generating your reading... Please wait.';
+        formMessage.textContent = 'Payment complete! Redirecting...';
         formMessage.style.color = 'var(--gold)';
         formMessage.style.display = 'block';
 
@@ -267,19 +267,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const orderId = form.dataset.orderId;
 
-        try {
-          const res = await fetch('/api/capture-payment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ paypalOrderId: data.orderID, orderId }),
-          });
-
-          if (!res.ok) {
-            formMessage.textContent = 'Payment received! Your reading will arrive by email within 10 minutes.';
-          }
-        } catch (err) {
-          // Network error — report will still be generated server-side
-        }
+        // Capture payment — server returns fast, generates report in background
+        await fetch('/api/capture-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paypalOrderId: data.orderID, orderId }),
+        }).catch(() => {});
 
         window.location.href = 'success.html';
       },

@@ -96,10 +96,16 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Payment amount mismatch' });
     }
 
-    // ---- Step 5: Generate report (wait for completion) ----
-    const result = await generateReport(orderData, orderId);
+    // ---- Step 5: Return OK, then generate report in background ----
+    res.status(200).json({ ok: true, orderId });
 
-    return res.status(200).json({ ok: true, orderId, ...result });
+    // Continue running after response — Vercel keeps function alive until maxDuration
+    try {
+      await generateReport(orderData, orderId);
+    } catch (err) {
+      console.error('[capture-payment] Report generation failed:', err.message);
+    }
+    return;
   } catch (err) {
     console.error('[capture-payment] Error:', err);
     return res.status(500).json({ error: 'Something went wrong. Please try again.' });
