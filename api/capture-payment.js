@@ -5,6 +5,7 @@
 
 export const config = { maxDuration: 300 };
 
+import { waitUntil } from '@vercel/functions';
 import { getOrder, isCompleted } from '../lib/error-handler.mjs';
 import { generateReport } from './generate-report.js';
 
@@ -98,16 +99,16 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Payment amount mismatch' });
     }
 
-    // ---- Step 5: Generate report, then return OK ----
-    console.log(`[capture-payment] Starting report generation for ${orderId}`);
-    try {
-      const result = await generateReport(orderData, orderId);
-      console.log(`[capture-payment] Report generation completed for ${orderId}:`, JSON.stringify(result));
-      return res.status(200).json({ ok: true, orderId, ...result });
-    } catch (err) {
-      console.error(`[capture-payment] Report generation FAILED for ${orderId}:`, err.message, err.stack);
-      return res.status(200).json({ ok: true, orderId, reportError: err.message });
-    }
+    // ---- Step 5: Return OK immediately, generate report in background ----
+    console.log(`[capture-payment] Payment captured. Starting background report for ${orderId}`);
+
+    waitUntil(
+      generateReport(orderData, orderId)
+        .then(result => console.log(`[capture-payment] Report completed for ${orderId}:`, JSON.stringify(result)))
+        .catch(err => console.error(`[capture-payment] Report FAILED for ${orderId}:`, err.message, err.stack))
+    );
+
+    return res.status(200).json({ ok: true, orderId });
   } catch (err) {
     console.error('[capture-payment] Error:', err);
     return res.status(500).json({ error: 'Something went wrong. Please try again.' });
