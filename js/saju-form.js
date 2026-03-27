@@ -124,10 +124,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const paypalContainer = document.getElementById('paypal-button-container');
     if (paypalContainer) {
       paypalContainer.style.display = formIsValid ? 'block' : 'none';
-      submitBtn.style.display = formIsValid ? 'none' : '';
     }
-    submitBtn.disabled = !formIsValid;
-    submitBtn.classList.toggle('disabled', !formIsValid);
+    submitBtn.disabled = true;
+    submitBtn.classList.add('disabled');
   }
 
   // ---- Prevent default form submit ----
@@ -150,10 +149,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const container = document.createElement('div');
     container.id = 'paypal-button-container';
     container.style.display = 'none';
-    container.style.marginTop = '4px';
+    container.style.marginTop = '12px';
     container.style.maxWidth = '400px';
-    container.style.margin = '4px auto 0';
-    submitBtn.parentElement.insertBefore(container, submitBtn);
+    container.style.marginLeft = 'auto';
+    container.style.marginRight = 'auto';
+    // Insert after the delivery time text (after formMessage)
+    formMessage.parentElement.appendChild(container);
 
     paypal.Buttons({
       style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay', height: 45 },
