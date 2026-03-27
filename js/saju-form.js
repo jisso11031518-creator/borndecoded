@@ -156,6 +156,8 @@ document.addEventListener('DOMContentLoaded', () => {
     container.id = 'paypal-button-container';
     container.style.display = 'none';
     container.style.marginTop = '4px';
+    container.style.maxWidth = '400px';
+    container.style.margin = '4px auto 0';
     submitBtn.parentElement.insertBefore(container, submitBtn);
 
     paypal.Buttons({
