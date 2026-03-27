@@ -9,7 +9,9 @@ export const config = { maxDuration: 60 };
 
 import { buildCoverPromptBody } from '../lib/gemini-image.mjs';
 
-const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent';
+// Model can be overridden via request body: { model: "gemini-2.0-flash" }
+const DEFAULT_MODEL = 'gemini-2.0-flash-exp-image-generation';
+const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -37,7 +39,9 @@ ${buildCoverPromptBody(coverArt)}`;
 
     console.log('[Gemini Test] Generating image...');
 
-    const apiRes = await fetch(`${GEMINI_URL}?key=${geminiKey}`, {
+    const model = req.body?.model || DEFAULT_MODEL;
+    console.log(`[Gemini Test] Using model: ${model}`);
+    const apiRes = await fetch(`${GEMINI_BASE}/${model}:generateContent?key=${geminiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
