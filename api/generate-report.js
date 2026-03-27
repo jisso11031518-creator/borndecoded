@@ -101,15 +101,21 @@ export async function generateReport(orderData, orderId) {
     }
     console.log('[Pipeline] Engine complete');
 
-    // ---- Step 2: Claude API ----
+    // ---- Step 2: Claude API (3 retries, 10s interval) → Gemini 3.0 Pro fallback (2 retries, 10s) ----
     let report;
     try {
       report = await callClaudeApi(engineResult, product);
       console.log('[Pipeline] Claude report complete');
     } catch (claudeErr) {
-      console.warn('[Pipeline] Claude failed, trying GPT-4o:', claudeErr.message);
-      report = await callGptFallback(engineResult, product);
-      console.log('[Pipeline] GPT-4o fallback complete');
+      console.warn('[Pipeline] Claude failed, trying Gemini 3.0 Pro text:', claudeErr.message);
+      try {
+        report = await callGeminiTextFallback(engineResult, product);
+        console.log('[Pipeline] Gemini text fallback complete');
+      } catch (geminiErr) {
+        console.warn('[Pipeline] Gemini text also failed, trying GPT-4o:', geminiErr.message);
+        report = await callGptFallback(engineResult, product);
+        console.log('[Pipeline] GPT-4o fallback complete');
+      }
     }
 
     // ---- Step 2b: Safety auto-replace ----
@@ -199,7 +205,7 @@ export async function generateReport(orderData, orderId) {
 }
 
 // ---- Claude API Call ----
-async function callClaudeApi(engineResult, product, retries = 2) {
+async function callClaudeApi(engineResult, product, retries = 3) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY not set');
 
@@ -231,8 +237,58 @@ async function callClaudeApi(engineResult, product, retries = 2) {
       return JSON.parse(textContent);
     } catch (err) {
       if (attempt <= retries) {
-        console.warn(`[Claude] Attempt ${attempt} failed, retrying in 3s...`);
-        await sleep(3000);
+        console.warn(`[Claude] Attempt ${attempt}/${retries} failed, retrying in 10s...`);
+        await sleep(10000);
+      } else {
+        throw err;
+      }
+    }
+  }
+}
+
+// ---- Gemini 3.0 Pro Text Fallback (2 retries, 10s interval) ----
+async function callGeminiTextFallback(engineResult, product) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error('GEMINI_API_KEY not set — cannot fall back to Gemini text');
+
+  const systemPrompt = product === 'saju' ? SAJU_SYSTEM_PROMPT : COMPATIBILITY_SYSTEM_PROMPT;
+  const userPrompt = product === 'saju'
+    ? buildSajuUserPrompt(engineResult)
+    : buildCompatibilityUserPrompt(engineResult);
+
+  const GEMINI_TEXT_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-preview-06-05:generateContent';
+
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const res = await fetch(`${GEMINI_TEXT_URL}?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{ text: systemPrompt + '\n\n' + userPrompt }],
+          }],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 10000,
+            responseMimeType: 'application/json',
+          },
+        }),
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`Gemini Text HTTP ${res.status}: ${errText.slice(0, 300)}`);
+      }
+
+      const data = await res.json();
+      const textContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!textContent) throw new Error('No text in Gemini response');
+
+      return JSON.parse(textContent);
+    } catch (err) {
+      if (attempt < 2) {
+        console.warn(`[Gemini Text] Attempt ${attempt}/2 failed, retrying in 10s...`);
+        await sleep(10000);
       } else {
         throw err;
       }
