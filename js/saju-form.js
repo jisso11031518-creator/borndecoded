@@ -61,7 +61,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     placeAuto.addEventListener('gmp-placeselect', async (e) => {
       const place = e.place;
-      await place.fetchFields({ fields: ['location', 'utcOffsetMinutes', 'formattedAddress'] });
+      console.log('[DEBUG] Place selected:', place);
+      try {
+        await place.fetchFields({ fields: ['location', 'utcOffsetMinutes', 'formattedAddress'] });
+        console.log('[DEBUG] After fetchFields — location:', place.location, 'address:', place.formattedAddress);
+      } catch (err) {
+        console.error('[DEBUG] fetchFields error:', err);
+      }
 
       if (place.location) {
         const lng = place.location.lng();
@@ -76,6 +82,9 @@ document.addEventListener('DOMContentLoaded', () => {
         inputEl.value = place.formattedAddress || '';
         document.getElementById('longitude').value = cityData.longitude;
         document.getElementById('timezone').value = cityData.timezone;
+        console.log('[DEBUG] City set:', inputEl.value, 'lng:', lng, 'tz:', cityData.timezone);
+      } else {
+        console.warn('[DEBUG] place.location is null/undefined');
       }
       validateForm();
     });
