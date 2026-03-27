@@ -22,15 +22,11 @@ export default async function handler(req, res) {
   if (!openaiKey) return res.status(500).json({ error: 'OPENAI_API_KEY not set' });
 
   try {
-    const coverArt = {
-      topImage: req.body?.topImage || 'a blazing tiger prowling through autumn orchards with golden light',
-      borderStyle: req.body?.borderStyle || 'delicate vine pattern with small autumn leaves curling at corners',
-      colorTone: req.body?.colorTone || 'warm amber, burnt orange, and gold tones',
-    };
+    const topImage = req.body?.topImage || 'a blazing tiger prowling through autumn orchards with golden light';
+    const borderStyle = req.body?.borderStyle || 'delicate vine pattern with small autumn leaves curling at corners';
+    const colorTone = req.body?.colorTone || 'warm amber, burnt orange, and gold tones';
 
-    const prompt = `Create a decorative page background for a premium astrology PDF report. Portrait orientation.
-
-${buildCoverPromptBody(coverArt)}`;
+    const prompt = `Delicate transparent watercolor painting in the style of traditional Asian ink-wash art combined with Western watercolor. Soft wet-on-wet technique with visible paper texture showing through translucent paint layers. On warm ivory parchment background (#F5EDE4). Content: ${topImage}. The painting fills top 80% with colors gradually dissolving into bare ivory parchment at bottom. Bottom 20% completely empty ivory. MUST look like hand-painted watercolor, NOT digital illustration, NOT graphic art, NOT vector. Loose brushstrokes, paint bleeding at edges, soft gradients. Border: thin single-line ${borderStyle} in ${colorTone}, maximum 30px width. NO text, NO letters, NO words, NO labels, NO text boxes anywhere.`;
 
     console.log('[DALL-E Test] Generating image...');
 
