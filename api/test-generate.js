@@ -4,6 +4,8 @@
  * Secured by TEST_SECRET header
  */
 
+export const config = { maxDuration: 300 };
+
 import { generateReport } from './generate-report.js';
 import { v4 as uuidv4 } from 'uuid';
 import { saveOrder } from '../lib/error-handler.mjs';

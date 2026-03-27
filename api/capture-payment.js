@@ -3,6 +3,8 @@
  * Capture PayPal payment → verify amount → trigger report generation
  */
 
+export const config = { maxDuration: 300 };
+
 import { getOrder, isCompleted } from '../lib/error-handler.mjs';
 import { generateReport } from './generate-report.js';
 
