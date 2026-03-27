@@ -28,43 +28,61 @@ document.addEventListener('DOMContentLoaded', () => {
     validateForm();
   });
 
-  // ---- Google Places Autocomplete ----
+  // ---- Google Places Autocomplete (New API) ----
   let cityData = { longitude: null, timezone: null };
 
   function initAutocomplete() {
     if (typeof google === 'undefined' || !google.maps?.places) {
-      // Retry after Google Maps loads
       setTimeout(initAutocomplete, 500);
       return;
     }
-    const input = document.getElementById('birthCityInput');
-    const autocomplete = new google.maps.places.Autocomplete(input, {
-      types: ['(cities)'],
-      fields: ['geometry', 'utc_offset_minutes', 'formatted_address'],
-    });
 
-    autocomplete.addListener('place_changed', () => {
-      const place = autocomplete.getPlace();
-      if (place.geometry) {
-        const lng = place.geometry.location.lng();
+    const inputEl = document.getElementById('birthCityInput');
+    const container = inputEl.parentElement;
+
+    // Create PlaceAutocompleteElement
+    const placeAuto = new google.maps.places.PlaceAutocompleteElement({
+      types: ['(cities)'],
+    });
+    placeAuto.style.width = '100%';
+
+    // Hide original input, insert Place element after it
+    inputEl.style.display = 'none';
+    container.appendChild(placeAuto);
+
+    // Style the Place element to match form
+    const style = document.createElement('style');
+    style.textContent = `
+      gmp-place-autocomplete { width: 100%; font-size: 1rem; padding: 10px 14px;
+        border: 1px solid rgba(201,169,110,0.3); border-radius: 8px;
+        background: white; color: #3C322D; }
+    `;
+    document.head.appendChild(style);
+
+    placeAuto.addEventListener('gmp-placeselect', async (e) => {
+      const place = e.place;
+      await place.fetchFields({ fields: ['location', 'utcOffsetMinutes', 'formattedAddress'] });
+
+      if (place.location) {
+        const lng = place.location.lng();
         cityData.longitude = lng;
 
-        // Estimate timezone from UTC offset (Google provides utc_offset_minutes)
-        if (place.utc_offset_minutes !== undefined) {
-          cityData.timezone = utcOffsetToTimezone(place.utc_offset_minutes, place.formatted_address);
+        if (place.utcOffsetMinutes !== undefined && place.utcOffsetMinutes !== null) {
+          cityData.timezone = utcOffsetToTimezone(place.utcOffsetMinutes, place.formattedAddress || '');
         } else {
           cityData.timezone = guessTimezone(lng);
         }
 
+        inputEl.value = place.formattedAddress || '';
         document.getElementById('longitude').value = cityData.longitude;
         document.getElementById('timezone').value = cityData.timezone;
       }
       validateForm();
     });
 
-    // Clear geo data if user manually edits
-    input.addEventListener('input', () => {
+    placeAuto.addEventListener('gmp-placeclear', () => {
       cityData = { longitude: null, timezone: null };
+      inputEl.value = '';
       document.getElementById('longitude').value = '';
       document.getElementById('timezone').value = '';
       validateForm();
