@@ -1,6 +1,6 @@
 /**
  * POST /api/saju-order
- * Receive saju order → save to KV → create Lemon Squeezy checkout → return URL
+ * Receive saju order → save to KV → redirect to Payhip checkout
  */
 
 import { v4 as uuidv4 } from 'uuid';
@@ -28,58 +28,13 @@ export default async function handler(req, res) {
     // Save to KV
     await saveOrder(orderId, { ...data, product: 'saju' });
 
-    // Create Lemon Squeezy Checkout
-    const checkoutUrl = await createLemonCheckout(orderId, 'saju');
+    // Payhip product URL
+    const productKey = process.env.PAYHIP_SAJU_KEY || '1dXEc';
+    const checkoutUrl = `https://payhip.com/b/${productKey}`;
 
     return res.status(200).json({ checkoutUrl });
   } catch (err) {
     console.error('[saju-order] Error:', err);
     return res.status(500).json({ error: 'Something went wrong. Please try again.' });
   }
-}
-
-async function createLemonCheckout(orderId, product) {
-  const apiKey = process.env.LEMON_SQUEEZY_API_KEY;
-  const storeId = process.env.LEMON_SQUEEZY_STORE_ID;
-  const variantId = product === 'saju'
-    ? process.env.LEMON_SQUEEZY_SAJU_VARIANT_ID
-    : process.env.LEMON_SQUEEZY_COMPAT_VARIANT_ID;
-
-  if (!apiKey || !storeId || !variantId) {
-    throw new Error('Lemon Squeezy config missing');
-  }
-
-  const res = await fetch('https://api.lemonsqueezy.com/v1/checkouts', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/vnd.api+json',
-      'Accept': 'application/vnd.api+json',
-    },
-    body: JSON.stringify({
-      data: {
-        type: 'checkouts',
-        attributes: {
-          checkout_data: {
-            custom: { orderId },
-          },
-          product_options: {
-            redirect_url: 'https://borndecoded.com/success.html',
-          },
-        },
-        relationships: {
-          store: { data: { type: 'stores', id: storeId } },
-          variant: { data: { type: 'variants', id: variantId } },
-        },
-      },
-    }),
-  });
-
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`Lemon Squeezy ${res.status}: ${errText.slice(0, 300)}`);
-  }
-
-  const json = await res.json();
-  return json.data.attributes.url;
 }

@@ -1,6 +1,6 @@
 /**
  * POST /api/compatibility-order
- * Receive compatibility order → save to KV → create Lemon Squeezy checkout → return URL
+ * Receive compatibility order → save to KV → redirect to Payhip checkout
  */
 
 import { v4 as uuidv4 } from 'uuid';
@@ -27,48 +27,11 @@ export default async function handler(req, res) {
     const orderId = uuidv4();
     await saveOrder(orderId, { ...data, product: 'compatibility' });
 
-    // Create Lemon Squeezy Checkout
-    const apiKey = process.env.LEMON_SQUEEZY_API_KEY;
-    const storeId = process.env.LEMON_SQUEEZY_STORE_ID;
-    const variantId = process.env.LEMON_SQUEEZY_COMPAT_VARIANT_ID;
+    // Payhip product URL
+    const productKey = process.env.PAYHIP_COMPAT_KEY || 'PIAGa';
+    const checkoutUrl = `https://payhip.com/b/${productKey}`;
 
-    if (!apiKey || !storeId || !variantId) {
-      throw new Error('Lemon Squeezy config missing');
-    }
-
-    const lsRes = await fetch('https://api.lemonsqueezy.com/v1/checkouts', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/vnd.api+json',
-        'Accept': 'application/vnd.api+json',
-      },
-      body: JSON.stringify({
-        data: {
-          type: 'checkouts',
-          attributes: {
-            checkout_data: {
-              custom: { orderId },
-            },
-            product_options: {
-              redirect_url: 'https://borndecoded.com/success.html',
-            },
-          },
-          relationships: {
-            store: { data: { type: 'stores', id: storeId } },
-            variant: { data: { type: 'variants', id: variantId } },
-          },
-        },
-      }),
-    });
-
-    if (!lsRes.ok) {
-      const errText = await lsRes.text();
-      throw new Error(`Lemon Squeezy ${lsRes.status}: ${errText.slice(0, 300)}`);
-    }
-
-    const json = await lsRes.json();
-    return res.status(200).json({ checkoutUrl: json.data.attributes.url });
+    return res.status(200).json({ checkoutUrl });
   } catch (err) {
     console.error('[compatibility-order] Error:', err);
     return res.status(500).json({ error: 'Something went wrong. Please try again.' });
