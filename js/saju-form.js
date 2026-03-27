@@ -1,6 +1,6 @@
 /**
  * Born Decoded — Saju Form Logic
- * Google Places Autocomplete + validation + submit to /api/saju-order
+ * Google Places Autocomplete + validation + PayPal checkout
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -103,6 +103,8 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('input', validateForm);
   form.addEventListener('change', validateForm);
 
+  let formIsValid = false;
+
   function validateForm() {
     const name = form.name.value.trim();
     const year = form.birthYear.value;
@@ -121,74 +123,136 @@ document.addEventListener('DOMContentLoaded', () => {
     const emailsDontMatch = email && emailConfirm && email !== emailConfirm;
     emailError.classList.toggle('show', emailsDontMatch);
 
-    const valid = name && year && month && day && city && hasGeo && gender && emailsMatch && agree1 && agree2 && agree3;
-    submitBtn.disabled = !valid;
-    submitBtn.classList.toggle('disabled', !valid);
+    formIsValid = name && year && month && day && city && hasGeo && gender && emailsMatch && agree1 && agree2 && agree3;
+
+    // Show/hide PayPal buttons based on validity
+    const paypalContainer = document.getElementById('paypal-button-container');
+    if (paypalContainer) {
+      paypalContainer.style.display = formIsValid ? 'block' : 'none';
+    }
+    submitBtn.style.display = formIsValid ? 'none' : 'block';
+    submitBtn.disabled = !formIsValid;
+    submitBtn.classList.toggle('disabled', !formIsValid);
   }
 
-  // ---- Submit ----
-  form.addEventListener('submit', async (e) => {
+  // ---- Prevent default form submit ----
+  form.addEventListener('submit', (e) => {
     e.preventDefault();
-
-    // GA4 event
-    if (typeof gtag === 'function') gtag('event', 'form_submit', { form_name: 'saju' });
-
-    const noTime = noTimeCheck.checked;
-
-    const payload = {
-      product: 'saju',
-      name: form.name.value.trim(),
-      birthYear: parseInt(form.birthYear.value),
-      birthMonth: parseInt(form.birthMonth.value),
-      birthDay: parseInt(form.birthDay.value),
-      birthHour: noTime ? null : (form.birthHour.value ? parseInt(form.birthHour.value) : null),
-      birthMinute: noTime ? null : (form.birthMinute.value ? parseInt(form.birthMinute.value) : 0),
-      birthTimeUnknown: noTime,
-      birthCity: form.birthCity.value.trim(),
-      longitude: parseFloat(document.getElementById('longitude').value),
-      timezone: document.getElementById('timezone').value,
-      gender: form.gender.value,
-      contextRelationship: getRadioValue(form, 'contextRelationship'),
-      contextCareer: getRadioValue(form, 'contextCareer'),
-      contextJob: (form.contextJob?.value || '').trim(),
-      contextCurious: getRadioValue(form, 'contextCurious'),
-      question1: form.question1.value.trim(),
-      question2: form.question2.value.trim(),
-      question3: form.question3.value.trim(),
-      email: form.email.value.trim(),
-    };
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Processing...';
-    formMessage.style.display = 'none';
-
-    try {
-      const res = await fetch('/api/saju-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || 'Server error');
-      }
-
-      const data = await res.json();
-
-      if (data.checkoutUrl) {
-        window.location.href = data.checkoutUrl;
-      } else {
-        window.location.href = 'success.html';
-      }
-    } catch (err) {
-      formMessage.textContent = err.message || 'Something went wrong. Please try again.';
-      formMessage.style.color = 'var(--fire)';
-      formMessage.style.display = 'block';
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Pay $9.99 — Get Your Reading →';
-    }
   });
+
+  // ---- PayPal Buttons ----
+  let paypalRendered = false;
+
+  function initPayPal() {
+    if (typeof paypal === 'undefined') {
+      setTimeout(initPayPal, 500);
+      return;
+    }
+    if (paypalRendered) return;
+    paypalRendered = true;
+
+    // Create PayPal button container
+    const container = document.createElement('div');
+    container.id = 'paypal-button-container';
+    container.style.display = 'none';
+    container.style.marginTop = '4px';
+    submitBtn.parentElement.insertBefore(container, submitBtn);
+
+    paypal.Buttons({
+      style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay', height: 45 },
+
+      createOrder: async () => {
+        if (!formIsValid) throw new Error('Please complete the form first');
+
+        if (typeof gtag === 'function') gtag('event', 'form_submit', { form_name: 'saju' });
+
+        const noTime = noTimeCheck.checked;
+        const payload = {
+          product: 'saju',
+          name: form.name.value.trim(),
+          birthYear: parseInt(form.birthYear.value),
+          birthMonth: parseInt(form.birthMonth.value),
+          birthDay: parseInt(form.birthDay.value),
+          birthHour: noTime ? null : (form.birthHour.value ? parseInt(form.birthHour.value) : null),
+          birthMinute: noTime ? null : (form.birthMinute.value ? parseInt(form.birthMinute.value) : 0),
+          birthTimeUnknown: noTime,
+          birthCity: form.birthCity.value.trim(),
+          longitude: parseFloat(document.getElementById('longitude').value),
+          timezone: document.getElementById('timezone').value,
+          gender: form.gender.value,
+          contextRelationship: getRadioValue(form, 'contextRelationship'),
+          contextCareer: getRadioValue(form, 'contextCareer'),
+          contextJob: (form.contextJob?.value || '').trim(),
+          contextCurious: getRadioValue(form, 'contextCurious'),
+          question1: form.question1.value.trim(),
+          question2: form.question2.value.trim(),
+          question3: form.question3.value.trim(),
+          email: form.email.value.trim(),
+        };
+
+        // Save order to KV
+        const orderRes = await fetch('/api/saju-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!orderRes.ok) {
+          const err = await orderRes.json().catch(() => ({}));
+          throw new Error(err.error || 'Server error');
+        }
+        const { orderId } = await orderRes.json();
+
+        // Store orderId for capture step
+        form.dataset.orderId = orderId;
+
+        // Create PayPal order
+        const ppRes = await fetch('/api/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId, product: 'saju' }),
+        });
+        if (!ppRes.ok) throw new Error('Failed to create payment');
+        const { paypalOrderId } = await ppRes.json();
+        return paypalOrderId;
+      },
+
+      onApprove: async (data) => {
+        formMessage.textContent = 'Completing payment...';
+        formMessage.style.color = 'var(--gold)';
+        formMessage.style.display = 'block';
+
+        const orderId = form.dataset.orderId;
+        const res = await fetch('/api/capture-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paypalOrderId: data.orderID, orderId }),
+        });
+
+        if (!res.ok) {
+          formMessage.textContent = 'Payment verification failed. Please contact borndecoded@gmail.com';
+          formMessage.style.color = 'var(--fire)';
+          return;
+        }
+
+        if (typeof gtag === 'function') gtag('event', 'purchase', { value: 9.99, currency: 'USD' });
+        window.location.href = 'success.html';
+      },
+
+      onCancel: () => {
+        formMessage.textContent = 'Payment was cancelled. You can try again.';
+        formMessage.style.color = 'var(--brown-light)';
+        formMessage.style.display = 'block';
+      },
+
+      onError: (err) => {
+        console.error('PayPal error:', err);
+        formMessage.textContent = 'Payment error. Please try again.';
+        formMessage.style.color = 'var(--fire)';
+        formMessage.style.display = 'block';
+      },
+    }).render('#paypal-button-container');
+  }
+  initPayPal();
 });
 
 // ---- Helpers ----

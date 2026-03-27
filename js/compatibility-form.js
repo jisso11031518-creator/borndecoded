@@ -1,6 +1,6 @@
 /**
  * Born Decoded — Compatibility Form Logic
- * Google Places Autocomplete (2 cities) + validation + submit to /api/compatibility-order
+ * Google Places Autocomplete (2 cities) + validation + PayPal checkout
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -120,6 +120,8 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('input', validateForm);
   form.addEventListener('change', validateForm);
 
+  let formIsValid = false;
+
   function validateForm() {
     const p1name = form.person1Name.value.trim();
     const p1year = form.person1BirthYear.value;
@@ -149,88 +151,149 @@ document.addEventListener('DOMContentLoaded', () => {
     const emailsDontMatch = email && emailConfirm && email !== emailConfirm;
     emailError.classList.toggle('show', emailsDontMatch);
 
-    const valid = p1name && p1year && p1month && p1day && p1city && p1geo && p1gender &&
+    formIsValid = p1name && p1year && p1month && p1day && p1city && p1geo && p1gender &&
                   p2name && p2year && p2month && p2day && p2city && p2geo && p2gender &&
                   relType && emailsMatch && agree1 && agree2 && agree3 && agree4;
 
-    submitBtn.disabled = !valid;
-    submitBtn.classList.toggle('disabled', !valid);
+    // Show/hide PayPal buttons based on validity
+    const paypalContainer = document.getElementById('paypal-button-container');
+    if (paypalContainer) {
+      paypalContainer.style.display = formIsValid ? 'block' : 'none';
+    }
+    submitBtn.style.display = formIsValid ? 'none' : 'block';
+    submitBtn.disabled = !formIsValid;
+    submitBtn.classList.toggle('disabled', !formIsValid);
   }
 
-  // ---- Submit ----
-  form.addEventListener('submit', async (e) => {
+  // ---- Prevent default form submit ----
+  form.addEventListener('submit', (e) => {
     e.preventDefault();
-
-    if (typeof gtag === 'function') gtag('event', 'form_submit', { form_name: 'compatibility' });
-
-    const p1noTime = form.querySelector('.no-time-check[data-target="person1"]').checked;
-    const p2noTime = form.querySelector('.no-time-check[data-target="person2"]').checked;
-
-    const payload = {
-      product: 'compatibility',
-      person1: {
-        name: form.person1Name.value.trim(),
-        birthYear: parseInt(form.person1BirthYear.value),
-        birthMonth: parseInt(form.person1BirthMonth.value),
-        birthDay: parseInt(form.person1BirthDay.value),
-        birthHour: p1noTime ? null : (form.person1BirthHour.value ? parseInt(form.person1BirthHour.value) : null),
-        birthMinute: p1noTime ? null : (form.person1BirthMinute.value ? parseInt(form.person1BirthMinute.value) : 0),
-        birthTimeUnknown: p1noTime,
-        birthCity: form.person1BirthCity.value.trim(),
-        longitude: parseFloat(document.getElementById('person1Longitude').value),
-        timezone: document.getElementById('person1Timezone').value,
-        gender: form.person1Gender.value,
-      },
-      person2: {
-        name: form.person2Name.value.trim(),
-        birthYear: parseInt(form.person2BirthYear.value),
-        birthMonth: parseInt(form.person2BirthMonth.value),
-        birthDay: parseInt(form.person2BirthDay.value),
-        birthHour: p2noTime ? null : (form.person2BirthHour.value ? parseInt(form.person2BirthHour.value) : null),
-        birthMinute: p2noTime ? null : (form.person2BirthMinute.value ? parseInt(form.person2BirthMinute.value) : 0),
-        birthTimeUnknown: p2noTime,
-        birthCity: form.person2BirthCity.value.trim(),
-        longitude: parseFloat(document.getElementById('person2Longitude').value),
-        timezone: document.getElementById('person2Timezone').value,
-        gender: form.person2Gender.value,
-      },
-      relationshipType: getRadioValue(form, 'relationshipType'),
-      question1: form.question1.value.trim(),
-      question2: form.question2.value.trim(),
-      email: form.email.value.trim(),
-    };
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Processing...';
-    formMessage.style.display = 'none';
-
-    try {
-      const res = await fetch('/api/compatibility-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || 'Server error');
-      }
-
-      const data = await res.json();
-
-      if (data.checkoutUrl) {
-        window.location.href = data.checkoutUrl;
-      } else {
-        window.location.href = 'success.html';
-      }
-    } catch (err) {
-      formMessage.textContent = err.message || 'Something went wrong. Please try again.';
-      formMessage.style.color = 'var(--fire)';
-      formMessage.style.display = 'block';
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Pay $5 — Get Your Compatibility Reading →';
-    }
   });
+
+  // ---- PayPal Buttons ----
+  let paypalRendered = false;
+
+  function initPayPal() {
+    if (typeof paypal === 'undefined') {
+      setTimeout(initPayPal, 500);
+      return;
+    }
+    if (paypalRendered) return;
+    paypalRendered = true;
+
+    // Create PayPal button container
+    const container = document.createElement('div');
+    container.id = 'paypal-button-container';
+    container.style.display = 'none';
+    container.style.marginTop = '4px';
+    submitBtn.parentElement.insertBefore(container, submitBtn);
+
+    paypal.Buttons({
+      style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay', height: 45 },
+
+      createOrder: async () => {
+        if (!formIsValid) throw new Error('Please complete the form first');
+
+        if (typeof gtag === 'function') gtag('event', 'form_submit', { form_name: 'compatibility' });
+
+        const p1noTime = form.querySelector('.no-time-check[data-target="person1"]').checked;
+        const p2noTime = form.querySelector('.no-time-check[data-target="person2"]').checked;
+
+        const payload = {
+          product: 'compatibility',
+          person1: {
+            name: form.person1Name.value.trim(),
+            birthYear: parseInt(form.person1BirthYear.value),
+            birthMonth: parseInt(form.person1BirthMonth.value),
+            birthDay: parseInt(form.person1BirthDay.value),
+            birthHour: p1noTime ? null : (form.person1BirthHour.value ? parseInt(form.person1BirthHour.value) : null),
+            birthMinute: p1noTime ? null : (form.person1BirthMinute.value ? parseInt(form.person1BirthMinute.value) : 0),
+            birthTimeUnknown: p1noTime,
+            birthCity: form.person1BirthCity.value.trim(),
+            longitude: parseFloat(document.getElementById('person1Longitude').value),
+            timezone: document.getElementById('person1Timezone').value,
+            gender: form.person1Gender.value,
+          },
+          person2: {
+            name: form.person2Name.value.trim(),
+            birthYear: parseInt(form.person2BirthYear.value),
+            birthMonth: parseInt(form.person2BirthMonth.value),
+            birthDay: parseInt(form.person2BirthDay.value),
+            birthHour: p2noTime ? null : (form.person2BirthHour.value ? parseInt(form.person2BirthHour.value) : null),
+            birthMinute: p2noTime ? null : (form.person2BirthMinute.value ? parseInt(form.person2BirthMinute.value) : 0),
+            birthTimeUnknown: p2noTime,
+            birthCity: form.person2BirthCity.value.trim(),
+            longitude: parseFloat(document.getElementById('person2Longitude').value),
+            timezone: document.getElementById('person2Timezone').value,
+            gender: form.person2Gender.value,
+          },
+          relationshipType: getRadioValue(form, 'relationshipType'),
+          question1: form.question1.value.trim(),
+          question2: form.question2.value.trim(),
+          email: form.email.value.trim(),
+        };
+
+        // Save order to KV
+        const orderRes = await fetch('/api/compatibility-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!orderRes.ok) {
+          const err = await orderRes.json().catch(() => ({}));
+          throw new Error(err.error || 'Server error');
+        }
+        const { orderId } = await orderRes.json();
+        form.dataset.orderId = orderId;
+
+        // Create PayPal order
+        const ppRes = await fetch('/api/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId, product: 'compatibility' }),
+        });
+        if (!ppRes.ok) throw new Error('Failed to create payment');
+        const { paypalOrderId } = await ppRes.json();
+        return paypalOrderId;
+      },
+
+      onApprove: async (data) => {
+        formMessage.textContent = 'Completing payment...';
+        formMessage.style.color = 'var(--gold)';
+        formMessage.style.display = 'block';
+
+        const orderId = form.dataset.orderId;
+        const res = await fetch('/api/capture-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paypalOrderId: data.orderID, orderId }),
+        });
+
+        if (!res.ok) {
+          formMessage.textContent = 'Payment verification failed. Please contact borndecoded@gmail.com';
+          formMessage.style.color = 'var(--fire)';
+          return;
+        }
+
+        if (typeof gtag === 'function') gtag('event', 'purchase', { value: 12.99, currency: 'USD' });
+        window.location.href = 'success.html';
+      },
+
+      onCancel: () => {
+        formMessage.textContent = 'Payment was cancelled. You can try again.';
+        formMessage.style.color = 'var(--brown-light)';
+        formMessage.style.display = 'block';
+      },
+
+      onError: (err) => {
+        console.error('PayPal error:', err);
+        formMessage.textContent = 'Payment error. Please try again.';
+        formMessage.style.color = 'var(--fire)';
+        formMessage.style.display = 'block';
+      },
+    }).render('#paypal-button-container');
+  }
+  initPayPal();
 });
 
 function getRadioValue(form, name) {

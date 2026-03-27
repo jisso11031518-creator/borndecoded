@@ -1,6 +1,6 @@
 /**
  * POST /api/compatibility-order
- * Receive compatibility order → save to KV → redirect to Payhip checkout
+ * Receive compatibility order → save to KV → return orderId
  */
 
 import { v4 as uuidv4 } from 'uuid';
@@ -27,11 +27,7 @@ export default async function handler(req, res) {
     const orderId = uuidv4();
     await saveOrder(orderId, { ...data, product: 'compatibility' });
 
-    // Payhip product URL
-    const productKey = process.env.PAYHIP_COMPAT_KEY || 'PIAGa';
-    const checkoutUrl = `https://payhip.com/b/${productKey}`;
-
-    return res.status(200).json({ checkoutUrl });
+    return res.status(200).json({ orderId });
   } catch (err) {
     console.error('[compatibility-order] Error:', err);
     return res.status(500).json({ error: 'Something went wrong. Please try again.' });

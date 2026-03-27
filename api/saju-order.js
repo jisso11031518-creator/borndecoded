@@ -1,6 +1,6 @@
 /**
  * POST /api/saju-order
- * Receive saju order → save to KV → redirect to Payhip checkout
+ * Receive saju order → save to KV → return orderId
  */
 
 import { v4 as uuidv4 } from 'uuid';
@@ -28,11 +28,7 @@ export default async function handler(req, res) {
     // Save to KV
     await saveOrder(orderId, { ...data, product: 'saju' });
 
-    // Payhip product URL
-    const productKey = process.env.PAYHIP_SAJU_KEY || '1dXEc';
-    const checkoutUrl = `https://payhip.com/b/${productKey}`;
-
-    return res.status(200).json({ checkoutUrl });
+    return res.status(200).json({ orderId });
   } catch (err) {
     console.error('[saju-order] Error:', err);
     return res.status(500).json({ error: 'Something went wrong. Please try again.' });
