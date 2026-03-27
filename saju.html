@@ -230,7 +230,7 @@
 </footer>
 
 <script>
-fetch('/api/maps-key').then(r=>r.json()).then(d=>{if(d.key){const s=document.createElement('script');s.src=`https://maps.googleapis.com/maps/api/js?key=${d.key}&libraries=places&loading=async`;s.async=true;document.head.appendChild(s);}});
+fetch('/api/maps-key').then(r=>r.json()).then(d=>{if(d.key){const s=document.createElement('script');s.src=`https://maps.googleapis.com/maps/api/js?key=${d.key}&libraries=places`;s.async=true;document.head.appendChild(s);}});
 </script>
 <script>
 fetch('/api/paypal-client-id').then(r=>r.json()).then(d=>{if(d.clientId){const s=document.createElement('script');s.src=`https://www.paypal.com/sdk/js?client-id=${d.clientId}&currency=USD`;s.async=true;document.head.appendChild(s);}});

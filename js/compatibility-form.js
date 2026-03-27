@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // ---- Google Places Autocomplete (2 cities, New API) ----
+  // ---- Google Places Autocomplete (2 cities) ----
   const geoData = {
     person1: { longitude: null, timezone: null },
     person2: { longitude: null, timezone: null },
@@ -57,48 +57,30 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Style for Place elements
-    const style = document.createElement('style');
-    style.textContent = `
-      gmp-place-autocomplete { width: 100%; font-size: 1rem; padding: 10px 14px;
-        border: 1px solid rgba(201,169,110,0.3); border-radius: 8px;
-        background: white; color: #3C322D; }
-    `;
-    document.head.appendChild(style);
-
     ['person1', 'person2'].forEach(person => {
       const input = document.getElementById(`${person}CityInput`);
-      const container = input.parentElement;
-
-      const placeAuto = new google.maps.places.PlaceAutocompleteElement({
+      const autocomplete = new google.maps.places.Autocomplete(input, {
         types: ['(cities)'],
+        fields: ['geometry', 'utc_offset_minutes', 'formatted_address'],
       });
-      placeAuto.style.width = '100%';
 
-      input.style.display = 'none';
-      container.appendChild(placeAuto);
-
-      placeAuto.addEventListener('gmp-placeselect', async (e) => {
-        const place = e.place;
-        await place.fetchFields({ fields: ['location', 'utcOffsetMinutes', 'formattedAddress'] });
-
-        if (place.location) {
-          const lng = place.location.lng();
+      autocomplete.addListener('place_changed', () => {
+        const place = autocomplete.getPlace();
+        if (place.geometry) {
+          const lng = place.geometry.location.lng();
           geoData[person].longitude = lng;
-          geoData[person].timezone = place.utcOffsetMinutes !== undefined && place.utcOffsetMinutes !== null
-            ? utcOffsetToTimezone(place.utcOffsetMinutes, place.formattedAddress || '')
+          geoData[person].timezone = place.utc_offset_minutes !== undefined
+            ? utcOffsetToTimezone(place.utc_offset_minutes, place.formatted_address)
             : guessTimezone(lng);
 
-          input.value = place.formattedAddress || '';
           document.getElementById(`${person}Longitude`).value = geoData[person].longitude;
           document.getElementById(`${person}Timezone`).value = geoData[person].timezone;
         }
         validateForm();
       });
 
-      placeAuto.addEventListener('gmp-placeclear', () => {
+      input.addEventListener('input', () => {
         geoData[person] = { longitude: null, timezone: null };
-        input.value = '';
         document.getElementById(`${person}Longitude`).value = '';
         document.getElementById(`${person}Timezone`).value = '';
         validateForm();
