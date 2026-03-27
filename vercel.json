@@ -1,6 +1,7 @@
 {
   "functions": {
     "api/webhook.js": { "maxDuration": 300 },
+    "api/capture-payment.js": { "maxDuration": 300 },
     "api/generate-report.js": { "maxDuration": 300 },
     "api/test-generate.js": { "maxDuration": 300 },
     "api/retry-failed.js": { "maxDuration": 300 }

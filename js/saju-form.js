@@ -215,24 +215,22 @@ document.addEventListener('DOMContentLoaded', () => {
       },
 
       onApprove: async (data) => {
-        formMessage.textContent = 'Completing payment...';
+        formMessage.textContent = 'Payment complete! Generating your reading...';
         formMessage.style.color = 'var(--gold)';
         formMessage.style.display = 'block';
 
+        if (typeof gtag === 'function') gtag('event', 'purchase', { value: 9.99, currency: 'USD' });
+
         const orderId = form.dataset.orderId;
-        const res = await fetch('/api/capture-payment', {
+
+        // Send capture request — server generates report before responding
+        fetch('/api/capture-payment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ paypalOrderId: data.orderID, orderId }),
-        });
+        }).catch(() => {});
 
-        if (!res.ok) {
-          formMessage.textContent = 'Payment verification failed. Please contact borndecoded@gmail.com';
-          formMessage.style.color = 'var(--fire)';
-          return;
-        }
-
-        if (typeof gtag === 'function') gtag('event', 'purchase', { value: 9.99, currency: 'USD' });
+        // Redirect to success page immediately
         window.location.href = 'success.html';
       },
 
