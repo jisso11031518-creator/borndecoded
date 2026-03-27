@@ -6,6 +6,11 @@
 import { kv } from '@vercel/kv';
 
 export default async function handler(req, res) {
+  const testSecret = process.env.TEST_SECRET;
+  const provided = req.headers['x-test-secret'];
+  if (!testSecret || provided !== testSecret) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
   const results = {};
 
   // 1. Test KV connection
