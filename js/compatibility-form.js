@@ -303,14 +303,47 @@ function getRadioValue(form, name) {
 
 function utcOffsetToTimezone(offsetMinutes, address) {
   const addr = (address || '').toLowerCase();
+
+  // Address-based matching (most reliable)
   if (addr.includes('korea')) return 'Asia/Seoul';
   if (addr.includes('japan') || addr.includes('tokyo')) return 'Asia/Tokyo';
-  if (addr.includes('australia') || addr.includes('sydney')) return offsetMinutes === 600 ? 'Australia/Sydney' : 'Australia/Perth';
   if (addr.includes('london') || addr.includes('united kingdom')) return 'Europe/London';
+  if (addr.includes('paris') || addr.includes('france')) return 'Europe/Paris';
+  if (addr.includes('berlin') || addr.includes('germany')) return 'Europe/Berlin';
+  if (addr.includes('sydney')) return 'Australia/Sydney';
+  if (addr.includes('melbourne')) return 'Australia/Melbourne';
+  if (addr.includes('brisbane')) return 'Australia/Brisbane';
+  if (addr.includes('perth')) return 'Australia/Perth';
+  if (addr.includes('australia')) return offsetMinutes === 600 ? 'Australia/Sydney' : 'Australia/Perth';
+
+  // UTC offset-based mapping (covers most cases)
   const hours = offsetMinutes / 60;
-  const US_MAP = { '-5': 'America/New_York', '-6': 'America/Chicago', '-7': 'America/Denver', '-8': 'America/Los_Angeles' };
-  if (US_MAP[String(hours)]) return US_MAP[String(hours)];
-  try { return Intl.DateTimeFormat().resolvedOptions().timeZone; } catch (e) {}
+  const OFFSET_MAP = {
+    '-10': 'Pacific/Honolulu',
+    '-9': 'America/Anchorage',
+    '-8': 'America/Los_Angeles',
+    '-7': 'America/Denver',
+    '-6': 'America/Chicago',
+    '-5': 'America/New_York',
+    '-4': 'America/Halifax',
+    '-3': 'America/Sao_Paulo',
+    '0': 'Europe/London',
+    '1': 'Europe/Paris',
+    '2': 'Europe/Berlin',
+    '3': 'Europe/Moscow',
+    '4': 'Asia/Dubai',
+    '5': 'Asia/Karachi',
+    '5.5': 'Asia/Kolkata',
+    '7': 'Asia/Bangkok',
+    '8': 'Asia/Shanghai',
+    '9': 'Asia/Seoul',
+    '10': 'Australia/Sydney',
+    '11': 'Pacific/Auckland',
+    '12': 'Pacific/Auckland',
+  };
+  if (OFFSET_MAP[String(hours)]) return OFFSET_MAP[String(hours)];
+
+  // Final fallback: UTC offset format (NEVER use browser timezone)
   return `UTC${hours >= 0 ? '+' : ''}${hours}`;
 }
 
