@@ -102,26 +102,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     formIsValid = name && year && month && day && city && hasGeo && gender && emailsMatch && agree1 && agree2 && agree3;
 
-    // DEBUG: show actual values
-    console.log('[DEBUG] Values:', { name, year, month, day, city, hasGeo, gender, email: email?.slice(0,3), emailConfirm: emailConfirm?.slice(0,3), agree1, agree2, agree3 });
-
-    // DEBUG: show which fields are missing (remove after testing)
+    // Guide message: show remaining required fields
     const missing = [];
-    if (!name) missing.push('Name');
-    if (!year) missing.push('Year');
-    if (!month) missing.push('Month');
-    if (!day) missing.push('Day');
-    if (!city) missing.push('City text');
-    if (!hasGeo) missing.push('City selection (click from dropdown)');
-    if (!gender) missing.push('Gender');
-    if (!emailsMatch) missing.push('Email match');
-    if (!agree1) missing.push('Checkbox 1');
-    if (!agree2) missing.push('Checkbox 2');
-    if (!agree3) missing.push('Checkbox 3');
+    if (!name) missing.push('name');
+    if (!year || !month || !day) missing.push('date of birth');
+    if (!city || !hasGeo) missing.push('birth city');
+    if (!gender) missing.push('gender');
+    if (!email) missing.push('email');
+    else if (!emailsMatch) missing.push('email confirmation');
+    if (!agree1 || !agree2 || !agree3) missing.push('agreements');
     if (missing.length > 0) {
-      console.log('[DEBUG] Missing fields:', missing.join(', '));
-      formMessage.textContent = 'Missing: ' + missing.join(', ');
-      formMessage.style.color = '#999';
+      formMessage.textContent = 'Please complete: ' + missing.join(', ');
+      formMessage.style.color = '#8a7a6a';
+      formMessage.style.fontSize = '0.82rem';
       formMessage.style.display = 'block';
     } else {
       formMessage.style.display = 'none';

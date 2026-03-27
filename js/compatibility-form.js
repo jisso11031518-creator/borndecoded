@@ -137,6 +137,23 @@ document.addEventListener('DOMContentLoaded', () => {
                   p2name && p2year && p2month && p2day && p2city && p2geo && p2gender &&
                   relType && emailsMatch && agree1 && agree2 && agree3 && agree4;
 
+    // Guide message: show remaining required fields
+    const missing = [];
+    if (!p1name || !p1year || !p1month || !p1day || !p1city || !p1geo || !p1gender) missing.push('your birth details');
+    if (!p2name || !p2year || !p2month || !p2day || !p2city || !p2geo || !p2gender) missing.push("partner's birth details");
+    if (!relType) missing.push('relationship type');
+    if (!email) missing.push('email');
+    else if (!emailsMatch) missing.push('email confirmation');
+    if (!agree1 || !agree2 || !agree3 || !agree4) missing.push('agreements');
+    if (missing.length > 0) {
+      formMessage.textContent = 'Please complete: ' + missing.join(', ');
+      formMessage.style.color = '#8a7a6a';
+      formMessage.style.fontSize = '0.82rem';
+      formMessage.style.display = 'block';
+    } else {
+      formMessage.style.display = 'none';
+    }
+
     // Show/hide PayPal buttons based on validity
     const paypalContainer = document.getElementById('paypal-button-container');
     if (paypalContainer) {
