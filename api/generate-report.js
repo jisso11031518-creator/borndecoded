@@ -16,7 +16,7 @@ import {
 } from '../lib/report-prompt.mjs';
 import { generateCoverImage, generateBodyImage } from '../lib/gemini-image-client.mjs';
 import { generateSajuPdf, generateCompatibilityPdf, sanitizeSafetyViolations } from '../lib/pdf-generator.mjs';
-import { sendReportEmail, sendPreparingEmail } from '../lib/email-sender.mjs';
+import { sendReportEmail, sendPreparingEmail, sendAdminReportEmail } from '../lib/email-sender.mjs';
 import { notifySuccess, notifyFailure, notifySafetyReplace } from '../lib/telegram.mjs';
 import { saveFailedOrder, markCompleted } from '../lib/error-handler.mjs';
 import { logOrder } from '../lib/supabase.mjs';
@@ -164,6 +164,12 @@ export async function generateReport(orderData, orderId) {
     // ---- Step 6: Send Email (with retry) ----
     await retryAsync(() => sendReportEmail(email, customerName, product, pdfBuffer), 3, 2000);
     console.log('[Pipeline] Email sent');
+
+    // ---- Step 6b: Send admin copy with PDF ----
+    try {
+      await sendAdminReportEmail(customerName, product, email, pdfBuffer);
+      console.log('[Pipeline] Admin email sent');
+    } catch (_) { /* non-blocking */ }
 
     // ---- Step 7: Mark completed + notify + log ----
     await markCompleted(orderId);
