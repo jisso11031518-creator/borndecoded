@@ -184,7 +184,8 @@ function populateDateDropdowns(form) {
   const monthSel = form.querySelector('[name="birthMonth"]');
   const daySel = form.querySelector('[name="birthDay"]');
 
-  for (let y = 2010; y >= 1940; y--) {
+  const maxBirthYear = new Date().getFullYear() - 19;
+  for (let y = maxBirthYear; y >= 1940; y--) {
     yearSel.innerHTML += `<option value="${y}">${y}</option>`;
   }
   const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];

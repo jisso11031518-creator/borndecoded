@@ -13,7 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ---- Populate all dropdowns ----
   form.querySelectorAll('.birth-year').forEach(sel => {
-    for (let y = 2010; y >= 1940; y--) sel.innerHTML += `<option value="${y}">${y}</option>`;
+    const maxBY = new Date().getFullYear() - 19;
+    for (let y = maxBY; y >= 1940; y--) sel.innerHTML += `<option value="${y}">${y}</option>`;
   });
   const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   form.querySelectorAll('.birth-month').forEach(sel => {
@@ -123,6 +124,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const emailConfirm = form.emailConfirm.value.trim();
     const agree1 = form.agreeEntertainment.checked;
     const agree2 = form.agreeRefund.checked;
+    const agree3 = form.agreeTerms?.checked;
+    const agree4 = form.agreeConsent?.checked;
 
     const emailsMatch = email && emailConfirm && email === emailConfirm;
     const emailsDontMatch = email && emailConfirm && email !== emailConfirm;
@@ -130,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const valid = p1name && p1year && p1month && p1day && p1city && p1geo && p1gender &&
                   p2name && p2year && p2month && p2day && p2city && p2geo && p2gender &&
-                  relType && emailsMatch && agree1 && agree2;
+                  relType && emailsMatch && agree1 && agree2 && agree3 && agree4;
 
     submitBtn.disabled = !valid;
     submitBtn.classList.toggle('disabled', !valid);
