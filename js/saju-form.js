@@ -252,7 +252,9 @@ document.addEventListener('DOMContentLoaded', () => {
         formMessage.style.color = 'var(--fire)';
         formMessage.style.display = 'block';
       },
-    }).render('#paypal-button-container');
+    }).render('#paypal-button-container').then(() => {
+      validateForm();
+    });
   }
   initPayPal();
 });
