@@ -134,6 +134,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     formIsValid = name && year && month && day && city && hasGeo && gender && emailsMatch && agree1 && agree2 && agree3;
 
+    // DEBUG: show actual values
+    console.log('[DEBUG] Values:', { name, year, month, day, city, hasGeo, gender, email: email?.slice(0,3), emailConfirm: emailConfirm?.slice(0,3), agree1, agree2, agree3 });
+
     // DEBUG: show which fields are missing (remove after testing)
     const missing = [];
     if (!name) missing.push('Name');
