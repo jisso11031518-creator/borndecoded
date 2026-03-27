@@ -159,8 +159,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const paypalContainer = document.getElementById('paypal-button-container');
     if (paypalContainer) {
       paypalContainer.style.display = formIsValid ? 'block' : 'none';
+      submitBtn.style.display = formIsValid ? 'none' : '';
     }
-    submitBtn.style.display = formIsValid ? 'none' : 'block';
     submitBtn.disabled = !formIsValid;
     submitBtn.classList.toggle('disabled', !formIsValid);
   }
