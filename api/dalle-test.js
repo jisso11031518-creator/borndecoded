@@ -6,6 +6,8 @@
 
 export const config = { maxDuration: 60 };
 
+import { buildCoverPromptBody } from '../lib/gemini-image.mjs';
+
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
@@ -20,19 +22,15 @@ export default async function handler(req, res) {
   if (!openaiKey) return res.status(500).json({ error: 'OPENAI_API_KEY not set' });
 
   try {
-    const { topImage, borderStyle, colorTone } = req.body || {};
+    const coverArt = {
+      topImage: req.body?.topImage || 'a blazing tiger prowling through autumn orchards with golden light',
+      borderStyle: req.body?.borderStyle || 'delicate vine pattern with small autumn leaves curling at corners',
+      colorTone: req.body?.colorTone || 'warm amber, burnt orange, and gold tones',
+    };
 
-    const prompt = `Premium decorative page for an astrology PDF report. Portrait orientation (tall, like A4 paper).
+    const prompt = `Create a decorative page background for a premium astrology PDF report. Portrait orientation.
 
-LAYOUT — top to bottom:
-1. THIN DECORATIVE BORDER FRAME around the entire page. Pattern: ${borderStyle || 'delicate vine pattern with small leaves'}. Style: single delicate pen stroke, very thin and airy. Colors: ${colorTone || 'soft gold and warm brown tones'}.
-2. WATERCOLOR PAINTING filling the top 75% inside the border: ${topImage || 'a blazing tiger prowling through autumn orchards with golden light'}. Rich, vivid watercolor that fades and dissolves into warm ivory at the bottom edge. Like wet paint bleeding into handmade paper.
-3. A thin horizontal gold line (#C9A96E) below where the watercolor fades out.
-4. Bottom 20%: completely empty warm ivory (#F5EDE4). No decoration.
-
-BACKGROUND: Warm ivory #F5EDE4.
-STYLE: Ethereal watercolor painting style on textured ivory parchment. Soft edges, flowing pigments, dreamy atmosphere. Like a luxury astrology book cover.
-CRITICAL: Absolutely NO text, NO numbers, NO labels, NO letters, NO words, NO writing anywhere in the image. This is PURE VISUAL ARTWORK only. Any text will ruin the image. ZERO text.`;
+${buildCoverPromptBody(coverArt)}`;
 
     console.log('[DALL-E Test] Generating image...');
 
