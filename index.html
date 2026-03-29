@@ -27,22 +27,154 @@
   </div>
 </header>
 
-<!-- ====== Hero ====== -->
+<!-- ====== 1. Hero ====== -->
 <section class="hero">
   <div class="hero-bg"></div>
   <div class="hero-content">
-    <img src="images/profile.png" alt="Born Decoded" class="hero-profile">
-    <h1>Discover what was written at your birth</h1>
-    <p class="hero-sub">AI-powered Korean Saju reading &middot; Personal PDF report &middot; From $9.99</p>
+    <p class="hero-eyebrow">Korean birth chart reading, decoded by AI</p>
+    <h1><em>&ldquo;You feel everything at 11<br>but present it at a steady 5.&rdquo;</em></h1>
+    <p class="hero-sub">If that hit too close — imagine 10+ pages written<br>from your exact birth date, time &amp; city.<br>Not your zodiac sign. <strong>Your personal code.</strong></p>
     <div class="hero-buttons">
-      <a href="saju.html" class="btn btn-cta btn-lg">Get Saju Reading — $9.99</a>
+      <a href="saju.html" class="btn btn-cta btn-lg">Get My Reading — $9.99</a>
       <a href="compatibility.html" class="btn btn-cta btn-lg">Get Compatibility — $12.99</a>
     </div>
-    <p style="margin-top:8px;font-size:0.78rem;color:#8a7a6a;text-align:center;">⚡ Delivered to your inbox in ~10 minutes</p>
+    <p class="hero-micro">&#9889; PDF in your inbox in 10 minutes</p>
   </div>
 </section>
 
-<!-- ====== How It Works ====== -->
+<!-- ====== 2. Sample Section A — Personal ====== -->
+<section class="section">
+  <div class="section-title">
+    <h2>Every reading is one of a kind</h2>
+    <p>Same service. Completely different results.</p>
+    <div class="gold-line"></div>
+  </div>
+
+  <!-- Cover Art Comparison -->
+  <div class="compare-covers">
+    <div class="compare-card" onclick="openLightbox(0)">
+      <img src="images/sample-yuki-cover.png" alt="Yuki's cover — cave water" loading="lazy">
+      <p class="compare-name">Yuki's Reading</p>
+    </div>
+    <div class="compare-card" onclick="openLightbox(1)">
+      <img src="images/sample-alex-cover.png" alt="Alex's cover — golden fortress" loading="lazy">
+      <p class="compare-name">Alex's Reading</p>
+    </div>
+  </div>
+  <p class="compare-note">Your cover art is generated from your unique birth chart — no two are alike.</p>
+
+  <!-- Personality -->
+  <div class="snipe-block">
+    <div class="snipe-text">
+      <h3 class="snipe-category">Personality</h3>
+      <div class="snipe-pair">
+        <div class="snipe-quote">
+          <span class="snipe-label">Yuki — Yin Water</span>
+          <blockquote>&ldquo;You feel everything at 11 but present it at a steady 5, then wonder why people think you're fine when you're drowning inside.&rdquo;</blockquote>
+        </div>
+        <div class="snipe-quote">
+          <span class="snipe-label">Alex — Yin Earth</span>
+          <blockquote>&ldquo;You say yes to everything, then quietly resent everyone for asking. Your mental spreadsheet of who owes you what is more detailed than most people's tax returns.&rdquo;</blockquote>
+        </div>
+      </div>
+    </div>
+    <div class="snipe-img" onclick="openLightbox(2)">
+      <img src="images/sample-personality.png" alt="Personality analysis page" loading="lazy">
+    </div>
+  </div>
+
+  <!-- Love -->
+  <div class="snipe-block snipe-reverse">
+    <div class="snipe-text">
+      <h3 class="snipe-category">Love</h3>
+      <div class="snipe-pair">
+        <div class="snipe-quote">
+          <span class="snipe-label">Yuki</span>
+          <blockquote>&ldquo;You fall for people who seem emotionally unavailable because it feels familiar.&rdquo;</blockquote>
+        </div>
+        <div class="snipe-quote">
+          <span class="snipe-label">Alex</span>
+          <blockquote>&ldquo;You keep attracting ships in distress when what you really want is another lighthouse to keep you company.&rdquo;</blockquote>
+        </div>
+      </div>
+    </div>
+    <div class="snipe-img" onclick="openLightbox(3)">
+      <img src="images/sample-love-1.png" alt="Love patterns page" loading="lazy">
+    </div>
+  </div>
+
+  <!-- This Year -->
+  <div class="snipe-block">
+    <div class="snipe-text">
+      <h3 class="snipe-category">This Year</h3>
+      <div class="snipe-pair">
+        <div class="snipe-quote">
+          <span class="snipe-label">Yuki</span>
+          <blockquote>&ldquo;2026 brings Fire energy — this is your year to stop hiding and start expressing.&rdquo;</blockquote>
+        </div>
+        <div class="snipe-quote">
+          <span class="snipe-label">Alex</span>
+          <blockquote>&ldquo;This is not the year to stay humble — your expertise deserves a platform.&rdquo;</blockquote>
+        </div>
+      </div>
+    </div>
+    <div class="snipe-img" onclick="openLightbox(5)">
+      <img src="images/sample-thisyear.png" alt="This year forecast page" loading="lazy">
+    </div>
+  </div>
+
+  <!-- Section CTA -->
+  <div class="section-cta">
+    <p class="section-cta-text">What will yours say?</p>
+    <a href="saju.html" class="btn btn-gold btn-lg">Get My Reading — $9.99</a>
+  </div>
+</section>
+
+<!-- ====== 3. Sample Section B — Compatibility ====== -->
+<section class="section section-blush">
+  <div class="section-title">
+    <h2>See how two charts collide</h2>
+    <p>Alex & Yuki's compatibility reading</p>
+    <div class="gold-line"></div>
+  </div>
+
+  <!-- Compat covers -->
+  <div class="compare-covers">
+    <div class="compare-card compare-card-wide" onclick="openLightbox(6)">
+      <img src="images/sample-compat-cover.png" alt="Compatibility cover art" loading="lazy">
+      <p class="compare-name">Cover Art</p>
+    </div>
+    <div class="compare-card compare-card-wide" onclick="openLightbox(7)">
+      <img src="images/sample-compat-score.png" alt="Compatibility score page" loading="lazy">
+      <p class="compare-name">Compatibility Score</p>
+    </div>
+  </div>
+
+  <!-- Compat snipe quotes -->
+  <div class="snipe-block">
+    <div class="snipe-text">
+      <div class="snipe-pair">
+        <div class="snipe-quote">
+          <blockquote>&ldquo;You two are like a riverbank and a rushing stream — one provides the steady foundation while the other brings life, movement, and constant change.&rdquo;</blockquote>
+        </div>
+        <div class="snipe-quote">
+          <blockquote>&ldquo;Alex gives practical solutions and concrete support, but Yuki needs emotional validation and space to process. You're both giving from your own element's strength, not necessarily what the other craves.&rdquo;</blockquote>
+        </div>
+      </div>
+    </div>
+    <div class="snipe-img" onclick="openLightbox(8)">
+      <img src="images/sample-compat-analysis.png" alt="Compatibility analysis page" loading="lazy">
+    </div>
+  </div>
+
+  <!-- Section CTA -->
+  <div class="section-cta">
+    <p class="section-cta-text">Try it with your person</p>
+    <a href="compatibility.html" class="btn btn-gold btn-lg">Get Compatibility — $12.99</a>
+  </div>
+</section>
+
+<!-- ====== 4. How It Works ====== -->
 <section class="section">
   <div class="section-title">
     <h2>How It Works</h2>
@@ -54,24 +186,24 @@
       <div class="step-icon">&#128221;</div>
       <p class="step-num">Step 1</p>
       <h3>Enter your birth details</h3>
-      <p>Share your date, time, and city of birth along with a few personal questions.</p>
+      <p>Share your date, time, and city of birth.</p>
     </div>
     <div class="step-card">
       <div class="step-icon">&#128302;</div>
       <p class="step-num">Step 2</p>
       <h3>AI decodes your Four Pillars</h3>
-      <p>Our AI engine analyzes your Saju chart using centuries-old Korean Four Pillars system.</p>
+      <p>Your Saju chart is analyzed using Korea's centuries-old system.</p>
     </div>
     <div class="step-card">
       <div class="step-icon">&#128231;</div>
       <p class="step-num">Step 3</p>
       <h3>Receive your PDF via email</h3>
-      <p>A beautifully designed personal report delivered to your inbox within 10 minutes.</p>
+      <p>A personalized 10+ page report delivered in ~10 minutes.</p>
     </div>
   </div>
 </section>
 
-<!-- ====== Product Cards ====== -->
+<!-- ====== 5. Choose Your Reading ====== -->
 <section class="section section-blush">
   <div class="section-title">
     <h2>Choose Your Reading</h2>
@@ -116,46 +248,12 @@
   </div>
 </section>
 
-<!-- ====== Sample Report ====== -->
-<section class="section">
-  <div class="section-title">
-    <h2>See What's Inside</h2>
-    <p>Preview pages from a real Saju report</p>
-    <div class="gold-line"></div>
-  </div>
-  <div class="samples-grid">
-    <div class="sample-card" onclick="openLightbox(0)">
-      <img class="sample-img" src="images/sample-cover.png" alt="Sample cover page" loading="lazy">
-      <div class="sample-label">Cover Page</div>
-    </div>
-    <div class="sample-card" onclick="openLightbox(1)">
-      <img class="sample-img" src="images/sample-intro.png" alt="Sample Four Pillars chart" loading="lazy">
-      <div class="sample-label">Four Pillars Chart</div>
-    </div>
-    <div class="sample-card" onclick="openLightbox(2)">
-      <img class="sample-img" src="images/sample-qa.png" alt="Sample survival guide page" loading="lazy">
-      <div class="sample-label">Survival Guide</div>
-    </div>
-  </div>
-  <p style="max-width:560px;margin:20px auto 0;font-size:0.85rem;color:#8a7a6a;text-align:center;line-height:1.6;padding:0 16px;">Born Decoded combines a precision-engineered Saju calculation engine with AI-powered narrative writing, rooted in traditional Four Pillars methodology. Every reading is generated from your actual birth chart data — not generic horoscope templates.</p>
-
-  <!-- Lightbox -->
-  <div id="lightbox" class="lb-overlay" onclick="closeLightbox(event)">
-    <button class="lb-close" onclick="closeLightbox(event)">&times;</button>
-    <button class="lb-arrow lb-prev" onclick="lbNav(event,-1)">&#8249;</button>
-    <img id="lb-img" class="lb-img" src="" alt="Sample page">
-    <button class="lb-arrow lb-next" onclick="lbNav(event,1)">&#8250;</button>
-  </div>
+<!-- ====== 6. Trust Line ====== -->
+<section class="trust-line">
+  <p>&#128202; 200+ readings generated &middot; True Solar Time corrected for your birth city &middot; Based on Korea's Four Pillars system</p>
 </section>
 
-<!-- ====== Social Proof ====== -->
-<section class="section section-blush" style="text-align:center;">
-  <p class="text-gold" style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.2em;margin-bottom:12px;">Start exploring what your birth chart holds</p>
-  <a href="https://www.youtube.com/@SajuDecode/shorts" target="_blank" rel="noopener" class="font-serif" style="font-size:1.8rem;font-weight:600;margin-bottom:8px;display:block;color:var(--brown);">@BornDecoded YouTube</a>
-  <p class="text-muted" style="margin-bottom:8px;">Watch free Saju content on YouTube</p>
-</section>
-
-<!-- ====== FAQ ====== -->
+<!-- ====== 7. FAQ (5 items) ====== -->
 <section class="section">
   <div class="section-title">
     <h2>Frequently Asked Questions</h2>
@@ -174,38 +272,11 @@
     </div>
     <div class="faq-item">
       <button class="faq-question">
-        <span>What is a Compatibility Reading?</span>
+        <span>What if I don't know my birth time?</span>
         <span class="faq-toggle">+</span>
       </button>
       <div class="faq-answer"><div class="faq-answer-inner">
-        A Compatibility Reading compares two people's Saju charts to reveal your relationship dynamics — chemistry, conflict points, and how to make it work. Whether it's a crush, partner, or even a friend, it shows what's really going on between you two.
-      </div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-question">
-        <span>What's the difference between Saju and Compatibility?</span>
-        <span class="faq-toggle">+</span>
-      </button>
-      <div class="faq-answer"><div class="faq-answer-inner">
-        Saju is all about YOU — your personality, career path, love life, and what this year holds. Compatibility is about the TWO of you — what pulls you together, where you'll clash, and whether it's built to last.
-      </div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-question">
-        <span>How is this different from Western astrology?</span>
-        <span class="faq-toggle">+</span>
-      </button>
-      <div class="faq-answer"><div class="faq-answer-inner">
-        Western astrology groups you by birth month into 12 star signs. Saju uses all four pillars — year, month, day, AND hour — creating a far more detailed and personal reading unique to you. No two Saju charts are alike.
-      </div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-question">
-        <span>How accurate is this?</span>
-        <span class="faq-toggle">+</span>
-      </button>
-      <div class="faq-answer"><div class="faq-answer-inner">
-        We use the same traditional calculations that professional Korean Saju masters have relied on for centuries — including True Solar Time correction for your exact birth location. That said, think of it as a mirror, not a crystal ball. It's designed for self-reflection and entertainment, not predicting lottery numbers.
+        No worries! Just select "I don't know my birth time" and we'll work with three pillars instead of four. You'll still get a detailed, insightful reading — you're just missing one layer, not the whole picture.
       </div></div>
     </div>
     <div class="faq-item">
@@ -215,33 +286,6 @@
       </button>
       <div class="faq-answer"><div class="faq-answer-inner">
         Your personalized PDF report will be sent to your email within 10 minutes after payment. Check your spam folder if you don't see it.
-      </div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-question">
-        <span>What language is the report in?</span>
-        <span class="faq-toggle">+</span>
-      </button>
-      <div class="faq-answer"><div class="faq-answer-inner">
-        Your report is 100% in English — written in clear, easy-to-understand language. No Korean knowledge needed.
-      </div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-question">
-        <span>Do I need to know anything about Saju beforehand?</span>
-        <span class="faq-toggle">+</span>
-      </button>
-      <div class="faq-answer"><div class="faq-answer-inner">
-        Not at all. Just enter your birth info and we handle the rest. Your report explains everything in plain English — no prior knowledge required.
-      </div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-question">
-        <span>What if I don't know my birth time?</span>
-        <span class="faq-toggle">+</span>
-      </button>
-      <div class="faq-answer"><div class="faq-answer-inner">
-        No worries! Just select "I don't know my birth time" and we'll work with three pillars instead of four. You'll still get a detailed, insightful reading — you're just missing one layer, not the whole picture.
       </div></div>
     </div>
     <div class="faq-item">
@@ -265,7 +309,7 @@
   </div>
 </section>
 
-<!-- ====== Final CTA ====== -->
+<!-- ====== 8. Final CTA ====== -->
 <section class="final-cta">
   <div class="final-cta-bg"></div>
   <div class="final-cta-content">
@@ -275,11 +319,11 @@
       <a href="saju.html" class="btn btn-cta btn-lg" style="background:#E8DDD2;color:var(--dark);">Get Saju Reading — $9.99</a>
       <a href="compatibility.html" class="btn btn-cta btn-lg" style="background:#E8DDD2;color:var(--dark);">Get Compatibility — $12.99</a>
     </div>
-    <p style="margin-top:8px;font-size:0.78rem;color:#8a7a6a;text-align:center;">⚡ Delivered to your inbox in ~10 minutes</p>
+    <p class="hero-micro" style="color:#8a7a6a;">&#9889; PDF in your inbox in ~10 minutes</p>
   </div>
 </section>
 
-<!-- ====== Footer ====== -->
+<!-- ====== 9. Footer ====== -->
 <footer class="footer">
   <div class="footer-inner">
     <div class="footer-logo">
@@ -303,7 +347,17 @@
 
 <script src="js/main.js"></script>
 <script>
-const lbImages = ['images/sample-cover.png','images/sample-intro.png','images/sample-qa.png'];
+const lbImages = [
+  'images/sample-yuki-cover.png',
+  'images/sample-alex-cover.png',
+  'images/sample-personality.png',
+  'images/sample-love-1.png',
+  'images/sample-love-2.png',
+  'images/sample-thisyear.png',
+  'images/sample-compat-cover.png',
+  'images/sample-compat-score.png',
+  'images/sample-compat-analysis.png'
+];
 let lbIdx = 0;
 const lbEl = document.getElementById('lightbox');
 const lbImg = document.getElementById('lb-img');
@@ -317,6 +371,13 @@ document.addEventListener('keydown', function(e) {
   if (e.key === 'ArrowRight') lbNav(e, 1);
 });
 </script>
+<!-- Lightbox -->
+<div id="lightbox" class="lb-overlay" onclick="closeLightbox(event)">
+  <button class="lb-close" onclick="closeLightbox(event)">&times;</button>
+  <button class="lb-arrow lb-prev" onclick="lbNav(event,-1)">&#8249;</button>
+  <img id="lb-img" class="lb-img" src="" alt="Sample page">
+  <button class="lb-arrow lb-next" onclick="lbNav(event,1)">&#8250;</button>
+</div>
 <script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
