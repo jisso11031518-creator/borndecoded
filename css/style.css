@@ -9,7 +9,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --ivory:   #F5EDE4;
+  --ivory:   #FAF7F3;
   --blush:   #EDD8D0;
   --gold:    #C9A96E;
   --brown:   #3D3028;
@@ -158,9 +158,9 @@ a { color: inherit; text-decoration: none; }
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(245,237,228,0.82) 0%,
-    rgba(245,237,228,0.75) 40%,
-    rgba(245,237,228,0.88) 100%
+    rgba(250,247,243,0.85) 0%,
+    rgba(250,247,243,0.78) 40%,
+    rgba(250,247,243,0.9) 100%
   );
 }
 .hero-content { position: relative; z-index: 1; max-width: 640px; }
@@ -258,7 +258,7 @@ a { color: inherit; text-decoration: none; }
 /* ---------- Snipe Blocks (quote + image) ---------- */
 .snipe-block {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr auto;
   gap: 32px;
   align-items: center;
   max-width: 960px;
@@ -300,19 +300,33 @@ a { color: inherit; text-decoration: none; }
   cursor: pointer;
 }
 .snipe-img img {
-  width: 100%;
-  border-radius: 12px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  width: 180px;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
   transition: transform 0.3s;
 }
-.snipe-img:hover img { transform: scale(1.02); }
+.snipe-img:hover img { transform: scale(1.04); }
+@media (min-width: 768px) {
+  .snipe-img img { width: 200px; }
+}
 @media (max-width: 768px) {
   .snipe-block {
     grid-template-columns: 1fr;
     gap: 24px;
   }
   .snipe-reverse { direction: ltr; }
-  .snipe-img { max-width: 360px; margin: 0 auto; }
+  .snipe-img { text-align: center; }
+  .snipe-img img { width: 160px; margin: 0 auto; }
+}
+
+/* ---------- Compat Quotes Centered ---------- */
+.snipe-quotes-centered {
+  max-width: 680px;
+  margin: 0 auto 32px;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 /* ---------- Section CTA ---------- */
