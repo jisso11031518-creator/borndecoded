@@ -338,6 +338,14 @@
   </div>
 </footer>
 
+<!-- Lightbox -->
+<div id="lightbox" class="lb-overlay" onclick="closeLightbox(event)">
+  <button class="lb-close" onclick="closeLightbox(event)">&times;</button>
+  <button class="lb-arrow lb-prev" onclick="lbNav(event,-1)">&#8249;</button>
+  <img id="lb-img" class="lb-img" src="" alt="Sample page">
+  <button class="lb-arrow lb-next" onclick="lbNav(event,1)">&#8250;</button>
+</div>
+
 <script src="js/main.js"></script>
 <script>
 const lbImages = [
@@ -363,13 +371,6 @@ document.addEventListener('keydown', function(e) {
   if (e.key === 'ArrowRight') lbNav(e, 1);
 });
 </script>
-<!-- Lightbox -->
-<div id="lightbox" class="lb-overlay" onclick="closeLightbox(event)">
-  <button class="lb-close" onclick="closeLightbox(event)">&times;</button>
-  <button class="lb-arrow lb-prev" onclick="lbNav(event,-1)">&#8249;</button>
-  <img id="lb-img" class="lb-img" src="" alt="Sample page">
-  <button class="lb-arrow lb-next" onclick="lbNav(event,1)">&#8250;</button>
-</div>
 <script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
