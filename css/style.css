@@ -977,6 +977,14 @@ a { color: inherit; text-decoration: none; }
   line-height: 1.5;
 }
 
+.hero-privacy {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  color: rgba(201,169,110,0.5);
+  text-align: center;
+  margin-top: 4px;
+}
+
 /* ---- Mini Form ---- */
 .mini-form {
   margin-top: 24px;
