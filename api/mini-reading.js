@@ -54,16 +54,69 @@ const FALLBACK_READINGS = {
   "Yin Water": "You feel everything at 11 but present it at a steady 5, then wonder why people think you're fine when you're drowning inside. Your intuition is almost supernatural, but you use it to help everyone except yourself. 2026 finally forces what you've been quietly carrying into the light. It's not exposure — it's relief."
 };
 
+// ---- Build saju data for Claude prompt (same format as PDF report-prompt.mjs) ----
+function buildMiniPromptData(result) {
+  const { fourPillars, jijanggan, twelveStages, elements, tenGods, dayMaster, shinsal, branchRelations, stemCombinations, yearlyEnergy } = result;
+
+  // Pillars compact (same as PDF)
+  const pillars = {};
+  for (const [key, label] of [['year', 'Year'], ['month', 'Month'], ['day', 'Day'], ['hour', 'Hour']]) {
+    const p = fourPillars[key];
+    if (!p) { pillars[label] = 'UNKNOWN (birth time not provided)'; continue; }
+    pillars[label] = `${p.hanja} (${p.romanization}) — ${p.tiangan.elementEn} ${p.tiangan.yinYangEn} / ${p.dizhi.elementEn} ${p.dizhi.yinYangEn} [${p.dizhi.animal}]`;
+  }
+
+  // Jijanggan compact
+  const jjCompact = {};
+  for (const [key, label] of [['year', 'Year'], ['month', 'Month'], ['day', 'Day'], ['hour', 'Hour']]) {
+    const j = jijanggan?.[key];
+    if (!j) { jjCompact[label] = null; continue; }
+    jjCompact[label] = [j.main, j.mid, j.init].filter(Boolean).map(s => `${s.hangul}(${s.elementEn})`).join(', ');
+  }
+
+  // Twelve stages compact
+  const stagesCompact = {};
+  for (const [key, label] of [['year', 'Year'], ['month', 'Month'], ['day', 'Day'], ['hour', 'Hour']]) {
+    const s = twelveStages?.[key];
+    stagesCompact[label] = s ? `${s.korean} (${s.english})` : null;
+  }
+
+  // Ten gods compact
+  const tgCompact = {};
+  for (const tg of tenGods) {
+    tgCompact[`${tg.position}_${tg.type}`] = `${tg.hanja}(${tg.elementEn}) → ${tg.tenGod.english} [${tg.tenGod.category}]`;
+  }
+
+  // Shinsal compact
+  const shinsalCompact = shinsal?.map(s => `${s.korean} (${s.english}): ${s.description}`) || [];
+
+  // Branch relations compact
+  const relCompact = branchRelations?.map(r => `${r.branches?.join('↔')} ${r.type}(${r.typeEn}) [${r.severity}]`) || [];
+
+  return {
+    pillars,
+    jijanggan: jjCompact,
+    twelveStages: stagesCompact,
+    dayMaster: {
+      element: dayMaster.dayMaster.elementEn,
+      yinYang: dayMaster.dayMaster.yinYangEn,
+      strength: dayMaster.strengthEn,
+      supportRatio: dayMaster.supportRatio + '%',
+    },
+    elements: elements.english,
+    missingElements: elements.missing.map(e => ({ '목': 'Wood', '화': 'Fire', '토': 'Earth', '금': 'Metal', '수': 'Water' }[e])),
+    tenGods: tgCompact,
+    shinsal: shinsalCompact,
+    branchRelations: relCompact,
+    stemCombinations: stemCombinations?.map(s => s.korean) || [],
+    yearlyEnergy: yearlyEnergy ? { year: yearlyEnergy.year, pillar: yearlyEnergy.pillar.hanja, stemGod: yearlyEnergy.tiangan.tenGod.english, branchGod: yearlyEnergy.dizhi.tenGod.english } : null,
+  };
+}
+
 // ---- Claude API call ----
-async function generateWithClaude(name, dayMaster, dayMasterHanja, elementData, pillars, specialStars) {
+async function generateWithClaude(name, sajuData) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return null;
-
-  const { Wood, Fire, Earth, Metal, Water } = elementData;
-  const missingElements = Object.entries(elementData)
-    .filter(([, v]) => v === 0)
-    .map(([k]) => k)
-    .join(', ') || 'None';
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10000);
@@ -79,65 +132,73 @@ async function generateWithClaude(name, dayMaster, dayMasterHanja, elementData, 
       signal: controller.signal,
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
-        max_tokens: 500,
+        max_tokens: 600,
+        system: `You are Born Decoded, a brutally honest yet warm Korean Saju (Four Pillars of Destiny) reader. You create deeply personal readings that feel like a real fortune teller is sitting across from the reader — someone who sees right through them, roasts them lovingly, and then lifts them up.
+
+## YOUR VOICE
+Think: wise older sister who reads you like a book, calls you out on your BS, makes you laugh, then makes you cry with how well she understands you.
+- ROAST with love
+- STATE hard truths with humor
+- COMFORT with genuine warmth
+- USE vivid metaphors from nature, food, daily life
+- SPEAK directly in second person
+
+## WRITING PRINCIPLES
+1. SHOW DON'T TELL — describe behavior and emotion, never expose star names or jargon labels.
+2. MAKE IT ONLY THEIRS — every sentence must trace to specific chart data. If a sentence could appear in any self-help book, delete it.
+3. NO GENERIC STATEMENTS — if you can't connect it to the chart data, don't write it.
+
+## BANNED PHRASES
+Never use: "you can't pour from an empty vessel", "the world needs your light", "you are enough", "trust the process", "embrace your authentic self", "trust the journey", "stop trying to X and start Y", "superpower in disguise", "not weakness — it's strength"
+
+## SAFETY
+- NEVER predict death, illness, or harm
+- NEVER discuss love/romance details, career specifics, money/wealth, or monthly forecasts — those are PAID content only
+- This is a FREE mini reading — personality + 2026 energy overview ONLY`,
         messages: [{
           role: "user",
-          content: `You are a Korean Saju (Four Pillars) reader writing a free mini reading. Based on the birth chart data below, write ONE unified reading paragraph.
+          content: `Write a free mini reading for ${name}.
 
-STRUCTURE (5-6 sentences, max 120 words, one flowing paragraph):
-1. Open with a gut-punch personality insight based on their element balance
-2. Transition to what 2026's energy specifically brings for them
-3. Name one thing to watch out for
-4. End with a line that feels like relief — someone finally named it
+SAJU CHART DATA:
+${JSON.stringify(sajuData, null, 2)}
 
-BIRTH CHART DATA:
-- Name: ${name}
-- Day Master: ${dayMaster} (${dayMasterHanja})
-- Element Distribution: Wood ${Wood}%, Fire ${Fire}%, Earth ${Earth}%, Metal ${Metal}%, Water ${Water}%
-- Missing Elements: ${missingElements}
-- Year Pillar: ${pillars.year}
-- Month Pillar: ${pillars.month}
-- Day Pillar: ${pillars.day}
-${specialStars ? `- Special Stars: ${specialStars}` : ''}
+MINI READING STRUCTURE (5-6 sentences, max 120 words, one flowing paragraph):
+1. Behavioral pattern — one specific thing others don't see but they know about themselves
+2. Element evidence — WHY, citing specific percentages, missing elements, or ten god relationships
+3. 2026 energy — what this year's 丙午 (Yang Fire / Horse) energy triggers in their specific chart
+4. One thing to watch out for — specific, grounded in chart data
+5. Inner truth — one line they've never admitted to themselves
 
-TONE EXAMPLES (match this exact style):
-- "You say yes to everything, then quietly resent everyone for asking."
-- "You feel everything at 11 but present it at a steady 5, then wonder why people think you're fine when you're drowning inside."
-- "Your biggest blind spot? Assuming that if people really cared, they'd dig deeper without you giving them a shovel."
-- "You keep attracting ships in distress when what you really want is another lighthouse to keep you company."
+EVIDENCE RULE:
+Every sentence must be traceable to specific saju data.
+- "You resent people" → because 편관/Seven Killings in month pillar pressures Day Master
+- "You hide your emotions" → because Water Day Master is suppressed by dominant Earth
+- "2026 is your year" → because 丙午 Fire feeds your chart's missing element
+Do NOT write generic personality statements. If you can't connect it to the chart data, don't write it.
 
-This is the voice. Brutally specific. Conversational. Calls out patterns they've never said out loud. Not generic motivational — it should sting a little, then feel like relief because someone finally named it.
+IMPORTANT: The tone examples in the system prompt are for STYLE REFERENCE ONLY. Do NOT copy them. Write completely original sentences. Every reading must be unique.
 
-IMPORTANT: The tone examples above are for STYLE REFERENCE ONLY. Do NOT copy or closely paraphrase these exact sentences. Write completely original sentences that match the same energy and specificity level. Every reading must be unique.
+CRITICAL: This is a FREE mini reading. Personality + 2026 overview ONLY.
+NEVER discuss: love/romance details, career specifics, money/wealth, monthly forecasts — those are paid content.
 
-CRITICAL RULES:
-- Use "you" directly — talk TO this person
-- Reference their specific element balance (e.g., "with 0% Fire, you..." or "your Earth-heavy chart...")
-- No astrology jargon. Plain, punchy English.
-- No generic statements that could apply to anyone.
-- One continuous paragraph, not bullet points.
-- Respond in exactly this JSON format, no other text:
+Respond in exactly this JSON format, no other text:
 {"reading": "..."}`
         }]
       })
     });
 
     clearTimeout(timeout);
-
     if (!response.ok) return null;
 
     const data = await response.json();
     const text = data.content?.[0]?.text;
     if (!text) return null;
 
-    // Extract JSON from response (handle markdown code blocks)
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) return null;
 
     const parsed = JSON.parse(jsonMatch[0]);
-    if (parsed.reading) {
-      return parsed;
-    }
+    if (parsed.reading) return parsed;
     return null;
   } catch {
     clearTimeout(timeout);
@@ -200,14 +261,13 @@ export default async function handler(req, res) {
       freeQuestions: [],
     });
 
-    // Extract data for response
+    // Extract display data
     const dayTiangan = result.fourPillars.day.tiangan;
     const dayMaster = `${dayTiangan.yinYangEn} ${dayTiangan.elementEn}`;
     const dayMasterHanja = dayTiangan.hanja;
     const dayMasterElement = dayTiangan.elementEn;
     const dayMasterYinYang = dayTiangan.yinYangEn;
 
-    // Element distribution (percentages in English)
     const elemEnglish = result.elements.english;
     const elementDistribution = {
       Wood: elemEnglish.Wood.percent,
@@ -222,23 +282,11 @@ export default async function handler(req, res) {
       return map[k];
     });
 
-    // Pillar labels for Claude prompt
-    const pillarLabels = {
-      year: result.fourPillars.year.hangul,
-      month: result.fourPillars.month.hangul,
-      day: result.fourPillars.day.hangul,
-    };
-
-    // Special stars
-    const specialStars = result.shinsal?.length > 0
-      ? result.shinsal.map(s => s.nameEn || s.name).join(', ')
-      : '';
+    // Build full saju data for Claude (same format as PDF)
+    const sajuData = buildMiniPromptData(result);
 
     // Try Claude AI
-    const aiResult = await generateWithClaude(
-      name.trim(), dayMaster, dayMasterHanja,
-      elementDistribution, pillarLabels, specialStars
-    );
+    const aiResult = await generateWithClaude(name.trim(), sajuData);
 
     const fallback = FALLBACK_READINGS[dayMaster] || FALLBACK_READINGS["Yin Water"];
     const reading = aiResult?.reading || fallback;
