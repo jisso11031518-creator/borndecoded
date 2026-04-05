@@ -165,12 +165,20 @@ NO swear words or profanity. Be brutal but clean. "goddamn", "hell", "shit", "da
 SAJU CHART DATA:
 ${JSON.stringify(sajuData, null, 2)}
 
-MINI READING STRUCTURE (5-6 sentences, max 120 words, one flowing paragraph):
+MINI READING STRUCTURE (6-7 sentences, max 130 words, one flowing paragraph):
 1. Behavioral pattern — one specific thing others don't see but they know about themselves
 2. Element evidence — WHY, citing specific percentages, missing elements, or ten god relationships
 3. 2026 energy — what this year's 丙午 (Yang Fire / Horse) energy triggers in their specific chart
 4. One thing to watch out for — specific, grounded in chart data
 5. Inner truth — one line they've never admitted to themselves
+6. Hook — Start with "But your chart also shows..." and TEASE that something good exists without revealing what. Cut off before the payoff. Make them NEED to know more.
+
+HOOK RULE for #6:
+Tease, don't deliver.
+- Bad: "Your Literary Star means you'll succeed through writing"
+- Good: "But there's something in your chart that changes everything — and it's actually good news."
+- Bad: "2026 brings love opportunities in May"
+- Good: "There's one window in 2026 where everything aligns. Your full reading reveals when."
 
 EVIDENCE RULE:
 Every sentence must be traceable to specific saju data.
