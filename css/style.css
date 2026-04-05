@@ -1107,56 +1107,79 @@ a { color: inherit; text-decoration: none; }
 
 /* ---- Result Card ---- */
 .mini-result-card {
-  background: rgba(250,247,243,0.97);
-  border: 1px solid rgba(201,169,110,0.3);
+  background: linear-gradient(165deg, rgba(250,247,243,0.98), rgba(237,216,208,0.15));
+  border: 1.5px solid rgba(201,169,110,0.4);
   border-radius: 16px;
-  padding: 32px 28px;
+  padding: 36px 28px;
   margin-bottom: 24px;
+  box-shadow: 0 4px 24px rgba(61,48,40,0.06), inset 0 1px 0 rgba(201,169,110,0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.mini-result-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
 
 .result-heading {
   font-family: var(--font-serif);
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   color: var(--gold);
   text-align: center;
   margin-bottom: 4px;
+  letter-spacing: 0.02em;
 }
 
 .dm-intro {
   text-align: center;
-  font-size: 0.95rem;
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
   color: var(--brown-light);
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .dm-badge {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 16px;
   border: 2px solid var(--gold);
-  border-radius: 12px;
-  padding: 16px 24px;
-  margin: 0 auto 24px;
-  max-width: 280px;
-  background: rgba(201,169,110,0.06);
+  border-radius: 14px;
+  padding: 20px 28px;
+  margin: 0 auto 28px;
+  max-width: 320px;
+  transition: background 0.3s;
+}
+
+.dm-icon-lg {
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.dm-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
 }
 
 .dm-name {
   font-family: var(--font-serif);
-  font-size: 1.6rem;
+  font-size: 1.7rem;
   font-weight: 600;
   color: var(--brown);
+  line-height: 1.2;
 }
 
-.dm-hanja {
-  font-size: 1.8rem;
+.dm-hanja-inline {
+  font-size: 1rem;
   color: var(--brown-light);
-  opacity: 0.7;
-}
-
-.dm-icon {
-  font-size: 1.5rem;
+  opacity: 0.6;
+  letter-spacing: 0.05em;
 }
 
 /* ---- Result divider ---- */
@@ -1190,71 +1213,94 @@ a { color: inherit; text-decoration: none; }
 .element-bars {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
 .element-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.element-row-dominant .element-label { font-weight: 600; }
+.element-row-missing { opacity: 0.7; }
+
+.element-label {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--brown);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.element-bar-wrap {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.element-label {
-  width: 48px;
-  font-family: var(--font-sans);
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--brown);
-  text-align: right;
-  flex-shrink: 0;
-}
-
 .element-track {
   flex: 1;
-  height: 14px;
+  height: 16px;
   background: rgba(0,0,0,0.04);
-  border-radius: 7px;
+  border-radius: 8px;
   overflow: hidden;
 }
 
 .element-fill {
   height: 100%;
-  border-radius: 7px;
+  border-radius: 8px;
   transition: width 0.8s ease-out;
 }
 
 .element-pct {
-  width: 90px;
+  width: 36px;
   font-family: var(--font-sans);
   font-size: 0.78rem;
-  color: var(--brown-light);
+  font-weight: 600;
+  color: var(--brown);
   flex-shrink: 0;
+  text-align: right;
 }
 
-.missing-badge {
+.element-insight {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  line-height: 1.3;
+  padding-left: 2px;
+}
+
+.element-insight-dominant {
+  color: var(--gold);
+  font-weight: 500;
+}
+
+.element-insight-missing {
   color: var(--fire);
   font-weight: 500;
-  font-size: 0.72rem;
 }
 
 /* ---- Quotes ---- */
 .result-quote {
   font-family: var(--font-serif);
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-style: italic;
   color: var(--brown);
   text-align: center;
-  line-height: 1.6;
+  line-height: 1.65;
   padding: 0 8px;
 }
 
 /* ---- CTA Card ---- */
 .mini-cta-card {
-  background: rgba(250,247,243,0.97);
-  border: 1px solid rgba(201,169,110,0.3);
+  background: linear-gradient(165deg, rgba(250,247,243,0.98), rgba(237,216,208,0.12));
+  border: 1.5px solid rgba(201,169,110,0.35);
   border-radius: 16px;
   padding: 28px 24px;
   margin-bottom: 40px;
+  box-shadow: 0 2px 16px rgba(61,48,40,0.04);
 }
 
 .cta-intro {

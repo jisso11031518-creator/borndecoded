@@ -92,19 +92,32 @@ document.addEventListener('DOMContentLoaded', () => {
     Water: '\u{1F4A7}',
   };
 
+  // ---- Element insight descriptions ----
+  const ELEMENT_INSIGHTS = {
+    Wood:    { high: 'Growth-driven · always reaching', missing: 'Lacks flexibility and fresh starts' },
+    Fire:    { high: 'Magnetic presence · impossible to ignore', missing: 'Lacks warmth, passion, and visibility' },
+    Earth:   { high: 'Grounded · everyone leans on you', missing: 'Lacks stability and inner security' },
+    Metal:   { high: 'Sharp mind · cuts through noise', missing: 'Lacks boundaries and decisiveness' },
+    Water:   { high: 'Deep feeler · reads every room', missing: 'Lacks flow, intuition, and adaptability' },
+  };
+
   // ---- Render result card ----
   function renderResult(data) {
     const resultCard = document.getElementById('resultCard');
     const ctaCard = document.getElementById('resultCTA');
 
-    // Day Master badge
+    // Day Master badge — element-colored
     const dmBadge = resultCard.querySelector('.dm-badge');
+    const elColor = ELEMENT_COLORS[data.dayMasterElement] || '#C9A96E';
     dmBadge.innerHTML = `
-      <span class="dm-name">${data.dayMaster}</span>
-      <span class="dm-hanja">${data.dayMasterHanja}</span>
-      <span class="dm-icon">${ELEMENT_ICONS[data.dayMasterElement] || ''}</span>
+      <span class="dm-icon-lg">${ELEMENT_ICONS[data.dayMasterElement] || ''}</span>
+      <div class="dm-text">
+        <span class="dm-name">${data.dayMaster}</span>
+        <span class="dm-hanja-inline">${data.dayMasterHanja}</span>
+      </div>
     `;
-    dmBadge.style.borderColor = ELEMENT_COLORS[data.dayMasterElement] || '#C9A96E';
+    dmBadge.style.borderColor = elColor;
+    dmBadge.style.background = `linear-gradient(135deg, ${elColor}12, ${elColor}06)`;
 
     // Name line
     resultCard.querySelector('.dm-intro').textContent = `${form.name.value.trim()}, you are`;
@@ -115,19 +128,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const elements = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
     const maxPercent = Math.max(...elements.map(e => data.elementDistribution[e]), 1);
 
+    // Find dominant element
+    const dominantEl = elements.reduce((a, b) =>
+      data.elementDistribution[a] >= data.elementDistribution[b] ? a : b
+    );
+
     for (const el of elements) {
       const pct = data.elementDistribution[el];
       const isMissing = pct === 0;
+      const isDominant = el === dominantEl && pct > 0;
       const barWidth = isMissing ? 0 : Math.max((pct / maxPercent) * 100, 4);
+      const insight = ELEMENT_INSIGHTS[el];
+
+      // Build insight text
+      let insightText = '';
+      if (isMissing) {
+        insightText = `<span class="element-insight element-insight-missing">\u26A0 ${insight.missing}</span>`;
+      } else if (isDominant) {
+        insightText = `<span class="element-insight element-insight-dominant">\u2605 ${insight.high}</span>`;
+      }
 
       const row = document.createElement('div');
-      row.className = 'element-row';
+      row.className = 'element-row' + (isMissing ? ' element-row-missing' : '') + (isDominant ? ' element-row-dominant' : '');
       row.innerHTML = `
-        <span class="element-label">${el}</span>
-        <div class="element-track">
-          <div class="element-fill" style="width:0%;background:${ELEMENT_COLORS[el]};"></div>
+        <span class="element-label">${ELEMENT_ICONS[el]} ${el}</span>
+        <div class="element-bar-wrap">
+          <div class="element-track">
+            <div class="element-fill" style="width:0%;background:${ELEMENT_COLORS[el]};"></div>
+          </div>
+          <span class="element-pct">${pct}%</span>
         </div>
-        <span class="element-pct">${pct}%${isMissing ? ' <span class="missing-badge">\u26A0 Missing</span>' : ''}</span>
+        ${insightText}
       `;
       barsContainer.appendChild(row);
 
