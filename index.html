@@ -27,18 +27,93 @@
   </div>
 </header>
 
-<!-- ====== 1. Hero ====== -->
-<section class="hero">
+<!-- ====== 1. Hero — Mini Reading ====== -->
+<section class="hero" id="miniHero">
   <div class="hero-bg"></div>
   <div class="hero-content">
     <p class="hero-eyebrow">Korean birth chart reading, decoded by AI</p>
-    <h1><em>&ldquo;You feel everything at 11<br>but present it at a steady 5.&rdquo;</em></h1>
-    <p class="hero-sub">If that hit too close — imagine 10+ pages written<br>from your exact birth date, time &amp; city.<br>Not your zodiac sign. <strong>Your personal code.</strong></p>
-    <div class="hero-buttons">
-      <a href="saju.html" class="btn btn-cta btn-lg">Get My Reading — $9.99</a>
-      <a href="compatibility.html" class="btn btn-cta btn-lg">Get Compatibility — $12.99</a>
+    <p class="hero-eyebrow-sub">Based on Korea's 1,000-year-old Four Pillars system</p>
+    <h1><em>&ldquo;What were you coded to become?&rdquo;</em></h1>
+    <p class="hero-sub">Enter your birthday. Get a free preview of your birth chart in seconds.</p>
+
+    <form id="miniForm" class="mini-form" novalidate>
+      <div class="mini-form-fields">
+        <input type="text" name="name" class="mini-input" placeholder="Your Name" required>
+        <select name="year" class="mini-select" required>
+          <option value="">Year</option>
+        </select>
+        <select name="month" class="mini-select" required>
+          <option value="">Month</option>
+        </select>
+        <select name="day" class="mini-select" required>
+          <option value="">Day</option>
+        </select>
+        <select name="gender" class="mini-select" required>
+          <option value="">Gender</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="non-binary">Non-binary</option>
+        </select>
+      </div>
+      <button type="submit" id="miniSubmitBtn" class="btn btn-cta btn-lg mini-submit disabled" disabled>
+        Decode Me &mdash; Free &#10024;
+      </button>
+      <p id="miniError" class="mini-error" style="display:none;"></p>
+    </form>
+
+    <p class="hero-micro">No email needed &middot; No sign-up &middot; 100% free</p>
+  </div>
+</section>
+
+<!-- ====== Mini Reading: Loading ====== -->
+<section class="mini-loading" id="miniLoading" style="display:none;">
+  <div class="mini-loading-inner">
+    <div class="mini-spinner"></div>
+    <p id="loadingText" class="loading-text">Reading your birth chart...</p>
+  </div>
+</section>
+
+<!-- ====== Mini Reading: Result ====== -->
+<section class="mini-result-section" id="miniResult" style="display:none;">
+
+  <!-- Result Card -->
+  <div class="mini-result-card" id="resultCard">
+    <h2 class="result-heading">&#10024; Your Day Master</h2>
+    <p class="dm-intro"></p>
+    <div class="dm-badge"></div>
+
+    <div class="result-divider">
+      <span>Your Five Elements</span>
     </div>
-    <p class="hero-micro">&#9889; PDF in your inbox in 10 minutes</p>
+    <div class="element-bars"></div>
+
+    <div class="result-divider">
+      <span>The Truth</span>
+    </div>
+    <p class="truth-text result-quote"></p>
+
+    <div class="result-divider">
+      <span>Your 2026</span>
+    </div>
+    <p class="forecast-text result-quote"></p>
+  </div>
+
+  <!-- CTA Card -->
+  <div class="mini-cta-card" id="resultCTA">
+    <p class="cta-intro">This was based on 3 of your 4 pillars.<br>
+    Your birth time and city unlock the full picture &mdash; with True Solar Time correction for your exact birth location.</p>
+
+    <div class="cta-product">
+      <h3>&#10022; Personal Saju Reading &mdash; $9.99</h3>
+      <p>All 4 pillars &middot; Love pattern &middot; Career &amp; money flow &middot; 2026 monthly forecast &middot; 3 questions answered &middot; Custom watercolor cover art</p>
+      <a href="saju.html" class="btn btn-gold btn-lg mini-cta-btn" data-cta="saju">Get My Full Reading &rarr;</a>
+    </div>
+
+    <div class="cta-product">
+      <h3>&#10022; Compatibility Reading &mdash; $12.99</h3>
+      <p>Two charts decoded &middot; Compatibility score &middot; Conflict patterns &middot; How you really see each other &middot; Couple's survival guide</p>
+      <a href="compatibility.html" class="btn btn-gold btn-lg mini-cta-btn" data-cta="compatibility">Get Compatibility &rarr;</a>
+    </div>
   </div>
 </section>
 
@@ -347,6 +422,7 @@
 </div>
 
 <script src="js/main.js"></script>
+<script src="js/mini-reading.js"></script>
 <script>
 const lbImages = [
   'images/sample-yuki-cover.png',
