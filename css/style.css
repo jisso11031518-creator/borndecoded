@@ -985,15 +985,11 @@ a { color: inherit; text-decoration: none; }
   margin-right: auto;
 }
 
-.mini-form-fields {
+.mini-form-row {
   display: flex;
   gap: 8px;
   align-items: flex-end;
-  justify-content: center;
-  margin-bottom: 16px;
-  max-width: 680px;
-  margin-left: auto;
-  margin-right: auto;
+  margin-bottom: 10px;
 }
 
 .mini-field {
@@ -1006,6 +1002,29 @@ a { color: inherit; text-decoration: none; }
 
 .mini-field-name {
   flex: 2.5 1 0;
+}
+
+.mini-field-city {
+  flex: 2.5 1 0;
+}
+
+.mini-notime {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  margin-bottom: 14px;
+  justify-content: center;
+}
+
+.mini-notime input[type="checkbox"] {
+  accent-color: var(--gold);
+}
+
+.mini-notime span {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  color: rgba(201,169,110,0.85);
 }
 
 .mini-label {
@@ -1339,16 +1358,17 @@ a { color: inherit; text-decoration: none; }
 
 /* ---- Mobile responsive ---- */
 @media (max-width: 600px) {
-  .mini-form-fields {
+  .mini-form-row {
     flex-wrap: wrap;
   }
 
-  .mini-field-name {
-    flex: 1 1 100%;
+  .mini-field {
+    flex: 1 1 45%;
   }
 
-  .mini-field:not(.mini-field-name) {
-    flex: 1 1 0;
+  .mini-field-name,
+  .mini-field-city {
+    flex: 1 1 100%;
   }
 
   .mini-result-card {

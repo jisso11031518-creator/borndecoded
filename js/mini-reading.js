@@ -1,6 +1,6 @@
 /**
  * Born Decoded — Mini Reading (Free Hero)
- * Form submission, loading animation, result card rendering, GA4 events
+ * Form with birth time + city, loading animation, result card, GA4
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -12,6 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const loadingSection = document.getElementById('miniLoading');
   const loadingText = document.getElementById('loadingText');
   const submitBtn = document.getElementById('miniSubmitBtn');
+  const noTimeCheck = document.getElementById('miniNoTime');
+  const hourSel = document.getElementById('miniHour');
+  const minuteSel = document.getElementById('miniMinute');
 
   // ---- Populate dropdowns ----
   const yearSel = form.querySelector('[name="year"]');
@@ -28,6 +31,58 @@ document.addEventListener('DOMContentLoaded', () => {
   for (let d = 1; d <= 31; d++) {
     daySel.innerHTML += `<option value="${d}">${d}</option>`;
   }
+  for (let h = 0; h <= 23; h++) {
+    hourSel.innerHTML += `<option value="${h}">${String(h).padStart(2, '0')}:00</option>`;
+  }
+  for (let m = 0; m <= 59; m += 5) {
+    minuteSel.innerHTML += `<option value="${m}">${String(m).padStart(2, '0')}</option>`;
+  }
+
+  // ---- "I don't know my birth time" checkbox ----
+  noTimeCheck.addEventListener('change', () => {
+    const disabled = noTimeCheck.checked;
+    [hourSel, minuteSel].forEach(s => {
+      s.disabled = disabled;
+      s.value = '';
+      s.style.opacity = disabled ? '0.4' : '1';
+    });
+    validateForm();
+  });
+
+  // ---- Google Places Autocomplete ----
+  let cityData = { longitude: null, timezone: null };
+
+  function initAutocomplete() {
+    if (typeof google === 'undefined' || !google.maps?.places) {
+      setTimeout(initAutocomplete, 500);
+      return;
+    }
+    const input = document.getElementById('miniBirthCity');
+    const autocomplete = new google.maps.places.Autocomplete(input, {
+      types: ['(cities)'],
+      fields: ['geometry', 'utc_offset_minutes', 'formatted_address'],
+    });
+    autocomplete.addListener('place_changed', () => {
+      const place = autocomplete.getPlace();
+      if (place.geometry) {
+        const lng = place.geometry.location.lng();
+        cityData.longitude = lng;
+        cityData.timezone = place.utc_offset_minutes !== undefined
+          ? utcOffsetToTimezone(place.utc_offset_minutes, place.formatted_address)
+          : guessTimezone(lng);
+        document.getElementById('miniLongitude').value = cityData.longitude;
+        document.getElementById('miniTimezone').value = cityData.timezone;
+      }
+      validateForm();
+    });
+    input.addEventListener('input', () => {
+      cityData = { longitude: null, timezone: null };
+      document.getElementById('miniLongitude').value = '';
+      document.getElementById('miniTimezone').value = '';
+      validateForm();
+    });
+  }
+  initAutocomplete();
 
   // ---- Form validation ----
   function validateForm() {
@@ -57,10 +112,8 @@ document.addEventListener('DOMContentLoaded', () => {
     heroSection.style.display = 'none';
     loadingSection.style.display = 'flex';
     resultSection.style.display = 'none';
-
     let stage = 0;
     loadingText.textContent = LOADING_STAGES[0];
-
     const interval = setInterval(() => {
       stage++;
       if (stage < LOADING_STAGES.length) {
@@ -71,7 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 200);
       }
     }, 1200);
-
     return interval;
   }
 
@@ -87,10 +139,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // ---- Render result card ----
   function renderResult(data) {
     const resultCard = document.getElementById('resultCard');
-
-    // Day Master badge — no emoji, clean text
-    const dmBadge = resultCard.querySelector('.dm-badge');
     const elColor = ELEMENT_COLORS[data.dayMasterElement] || '#C9A96E';
+
+    // Day Master badge
+    const dmBadge = resultCard.querySelector('.dm-badge');
     dmBadge.innerHTML = `
       <div class="dm-text">
         <span class="dm-name">${data.dayMaster}</span>
@@ -100,10 +152,9 @@ document.addEventListener('DOMContentLoaded', () => {
     dmBadge.style.borderColor = elColor;
     dmBadge.style.background = `linear-gradient(135deg, ${elColor}12, ${elColor}06)`;
 
-    // Name line
     resultCard.querySelector('.dm-intro').textContent = `${form.name.value.trim()}, you are`;
 
-    // Element bars — PDF style (clean, minimal, no emoji)
+    // Element bars
     const barsContainer = resultCard.querySelector('.element-bars');
     barsContainer.innerHTML = '';
     const elements = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
@@ -113,7 +164,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const pct = data.elementDistribution[el];
       const isMissing = pct === 0;
       const barWidth = isMissing ? 0 : Math.max((pct / maxPercent) * 100, 4);
-
       const row = document.createElement('div');
       row.className = 'element-row';
       row.innerHTML = `
@@ -124,7 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
         <span class="element-pct">${isMissing ? 'Missing' : pct + '%'}</span>
       `;
       barsContainer.appendChild(row);
-
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           row.querySelector('.element-fill').style.width = barWidth + '%';
@@ -132,23 +181,19 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Reading — single unified block
+    // Reading
     resultCard.querySelector('.reading-text').textContent = `"${data.reading}"`;
 
     // Show result
     loadingSection.style.display = 'none';
     resultSection.style.display = 'block';
     resultSection.classList.add('fade-in');
-
     setTimeout(() => {
       resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
 
-    // GA4: result shown
     if (typeof gtag === 'function') {
-      gtag('event', 'mini_reading_result_shown', {
-        day_master: data.dayMaster,
-      });
+      gtag('event', 'mini_reading_result_shown', { day_master: data.dayMaster });
     }
   }
 
@@ -165,12 +210,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     try {
+      const noTime = noTimeCheck.checked;
       const payload = {
         name: form.name.value.trim(),
         year: parseInt(form.year.value),
         month: parseInt(form.month.value),
         day: parseInt(form.day.value),
         gender: form.gender.value,
+        hour: noTime ? null : (hourSel.value ? parseInt(hourSel.value) : null),
+        minute: noTime ? null : (minuteSel.value ? parseInt(minuteSel.value) : 0),
+        birthCity: form.birthCity?.value?.trim() || '',
+        longitude: document.getElementById('miniLongitude').value ? parseFloat(document.getElementById('miniLongitude').value) : null,
+        timezone: document.getElementById('miniTimezone').value || null,
       };
 
       const response = await fetch('/api/mini-reading', {
@@ -180,10 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Something went wrong');
-      }
+      if (!response.ok) throw new Error(data.error || 'Something went wrong');
 
       const elapsed = Date.now() - startTime;
       const remaining = Math.max(2000 - elapsed, 0);
@@ -191,12 +239,8 @@ document.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => {
         clearInterval(loadingInterval);
         renderResult(data);
-
         if (typeof gtag === 'function') {
-          gtag('event', 'mini_reading_submit', {
-            day_master: data.dayMaster,
-            source: data.source,
-          });
+          gtag('event', 'mini_reading_submit', { day_master: data.dayMaster, source: data.source });
         }
       }, remaining);
 
@@ -204,7 +248,6 @@ document.addEventListener('DOMContentLoaded', () => {
       clearInterval(loadingInterval);
       loadingSection.style.display = 'none';
       heroSection.style.display = 'block';
-
       const errorEl = document.getElementById('miniError');
       if (errorEl) {
         errorEl.textContent = err.message || 'Something went wrong. Please try again.';
@@ -219,9 +262,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const ctaBtn = e.target.closest('.mini-cta-btn');
     if (!ctaBtn) return;
     if (typeof gtag === 'function') {
-      gtag('event', 'mini_reading_cta_click', {
-        cta_type: ctaBtn.dataset.cta || 'saju',
-      });
+      gtag('event', 'mini_reading_cta_click', { cta_type: ctaBtn.dataset.cta || 'saju' });
     }
   });
 });
+
+// ---- Timezone helpers (from saju-form.js) ----
+function utcOffsetToTimezone(offsetMinutes, address) {
+  const addr = (address || '').toLowerCase();
+  if (addr.includes('korea')) return 'Asia/Seoul';
+  if (addr.includes('japan') || addr.includes('tokyo')) return 'Asia/Tokyo';
+  if (addr.includes('london') || addr.includes('united kingdom')) return 'Europe/London';
+  if (addr.includes('paris') || addr.includes('france')) return 'Europe/Paris';
+  if (addr.includes('berlin') || addr.includes('germany')) return 'Europe/Berlin';
+  if (addr.includes('sydney')) return 'Australia/Sydney';
+  if (addr.includes('melbourne')) return 'Australia/Melbourne';
+  if (addr.includes('brisbane')) return 'Australia/Brisbane';
+  if (addr.includes('perth')) return 'Australia/Perth';
+  if (addr.includes('australia')) return offsetMinutes === 600 ? 'Australia/Sydney' : 'Australia/Perth';
+  const hours = offsetMinutes / 60;
+  const OFFSET_MAP = {
+    '-10':'Pacific/Honolulu','-9':'America/Anchorage','-8':'America/Los_Angeles',
+    '-7':'America/Denver','-6':'America/Chicago','-5':'America/New_York',
+    '-4':'America/Halifax','-3':'America/Sao_Paulo','0':'Europe/London',
+    '1':'Europe/Paris','2':'Europe/Berlin','3':'Europe/Moscow','4':'Asia/Dubai',
+    '5':'Asia/Karachi','5.5':'Asia/Kolkata','7':'Asia/Bangkok','8':'Asia/Shanghai',
+    '9':'Asia/Seoul','10':'Australia/Sydney','11':'Pacific/Auckland','12':'Pacific/Auckland',
+  };
+  if (OFFSET_MAP[String(hours)]) return OFFSET_MAP[String(hours)];
+  return `UTC${hours >= 0 ? '+' : ''}${hours}`;
+}
+
+function guessTimezone(longitude) {
+  const offset = Math.round(longitude / 15);
+  return `UTC${offset >= 0 ? '+' : ''}${offset}`;
+}

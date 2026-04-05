@@ -37,7 +37,8 @@
     <p class="hero-sub-value">See your Day Master, Five Element balance &amp; personalized insight &mdash; free, in seconds.</p>
 
     <form id="miniForm" class="mini-form" novalidate>
-      <div class="mini-form-fields">
+      <!-- Row 1: Name + Date of Birth -->
+      <div class="mini-form-row">
         <div class="mini-field mini-field-name">
           <label class="mini-label">Name</label>
           <input type="text" name="name" class="mini-input" placeholder="e.g. Sarah" required>
@@ -60,6 +61,27 @@
             <option value="">Day</option>
           </select>
         </div>
+      </div>
+      <!-- Row 2: Time + City + Gender -->
+      <div class="mini-form-row">
+        <div class="mini-field">
+          <label class="mini-label">Hour</label>
+          <select name="hour" class="mini-select" id="miniHour">
+            <option value="">Hour</option>
+          </select>
+        </div>
+        <div class="mini-field">
+          <label class="mini-label">Minute</label>
+          <select name="minute" class="mini-select" id="miniMinute">
+            <option value="">Min</option>
+          </select>
+        </div>
+        <div class="mini-field mini-field-city">
+          <label class="mini-label">Birth City</label>
+          <input type="text" name="birthCity" id="miniBirthCity" class="mini-input" placeholder="Start typing..." autocomplete="off">
+          <input type="hidden" name="longitude" id="miniLongitude">
+          <input type="hidden" name="timezone" id="miniTimezone">
+        </div>
         <div class="mini-field">
           <label class="mini-label">Gender</label>
           <select name="gender" class="mini-select" required>
@@ -70,6 +92,11 @@
           </select>
         </div>
       </div>
+      <!-- No birth time checkbox -->
+      <label class="mini-notime">
+        <input type="checkbox" id="miniNoTime">
+        <span>I don't know my birth time</span>
+      </label>
       <button type="submit" id="miniSubmitBtn" class="btn btn-cta btn-lg mini-submit disabled" disabled>
         Decode Me &mdash; Free &#10024;
       </button>
@@ -107,7 +134,7 @@
     </div>
     <p class="reading-text result-quote"></p>
 
-    <p class="reading-footnote">This was a glimpse from 3 of your 4 pillars. Your full report is 17+ pages &mdash; personality, love patterns, career &amp; money flow, 2026 monthly forecast, and 3 personal questions answered.</p>
+    <p class="reading-footnote">This was a glimpse from your full birth chart. Your 17+ page report goes deeper &mdash; personality, love patterns, career &amp; money flow, 2026 monthly forecast, and 3 personal questions answered.</p>
   </div>
 
   <!-- CTA Card -->
@@ -432,6 +459,9 @@
 </div>
 
 <script src="js/main.js"></script>
+<script>
+fetch('/api/maps-key').then(r=>r.json()).then(d=>{if(d.key){const s=document.createElement('script');s.src=`https://maps.googleapis.com/maps/api/js?key=${d.key}&libraries=places`;s.async=true;document.head.appendChild(s);}});
+</script>
 <script src="js/mini-reading.js"></script>
 <script>
 const lbImages = [

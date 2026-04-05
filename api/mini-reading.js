@@ -158,7 +158,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { name, year, month, day, gender } = req.body || {};
+    const { name, year, month, day, gender, hour, minute, birthCity, longitude, timezone } = req.body || {};
 
     // Validation
     if (!name || typeof name !== 'string' || name.trim().length < 1 || name.trim().length > 50) {
@@ -178,18 +178,22 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Gender must be male, female, or non-binary' });
     }
 
-    // Run saju engine (3 pillars — no hour, no city)
+    // Parse optional time fields
+    const parsedHour = (hour !== null && hour !== undefined && hour !== '') ? parseInt(hour) : null;
+    const parsedMinute = (minute !== null && minute !== undefined && minute !== '') ? parseInt(minute) : 0;
+
+    // Run saju engine (3 or 4 pillars depending on hour)
     const result = runSajuEngine({
       name: name.trim(),
       year: y,
       month: m,
       day: d,
-      hour: null,
-      minute: 0,
-      longitude: undefined,
-      timezone: 'America/New_York',
+      hour: parsedHour,
+      minute: parsedMinute,
+      longitude: longitude || undefined,
+      timezone: timezone || 'America/New_York',
       gender,
-      birthCity: '',
+      birthCity: birthCity || '',
       fixedQuestions: { gender, relationship: '', career: '' },
       freeQuestions: [],
     });
