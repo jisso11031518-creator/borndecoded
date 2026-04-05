@@ -86,7 +86,7 @@ const FALLBACK_TEXTS = {
 
 // ---- Claude API call ----
 async function generateWithClaude(name, dayMaster, dayMasterHanja, elementData, pillars, specialStars) {
-  const apiKey = process.env.CLAUDE_API_KEY;
+  const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return null;
 
   const { Wood, Fire, Earth, Metal, Water } = elementData;
