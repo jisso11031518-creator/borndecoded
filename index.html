@@ -38,23 +38,27 @@
 
     <form id="miniForm" class="mini-form" novalidate>
       <div class="mini-form-fields">
-        <div class="mini-field">
+        <div class="mini-field mini-field-name">
           <label class="mini-label">Name</label>
           <input type="text" name="name" class="mini-input" placeholder="e.g. Sarah" required>
         </div>
-        <div class="mini-field mini-field-dob">
-          <label class="mini-label">Date of Birth</label>
-          <div class="mini-dob-row">
-            <select name="year" class="mini-select" required>
-              <option value="">Year</option>
-            </select>
-            <select name="month" class="mini-select" required>
-              <option value="">Month</option>
-            </select>
-            <select name="day" class="mini-select" required>
-              <option value="">Day</option>
-            </select>
-          </div>
+        <div class="mini-field">
+          <label class="mini-label">Year</label>
+          <select name="year" class="mini-select" required>
+            <option value="">Year</option>
+          </select>
+        </div>
+        <div class="mini-field">
+          <label class="mini-label">Month</label>
+          <select name="month" class="mini-select" required>
+            <option value="">Month</option>
+          </select>
+        </div>
+        <div class="mini-field">
+          <label class="mini-label">Day</label>
+          <select name="day" class="mini-select" required>
+            <option value="">Day</option>
+          </select>
         </div>
         <div class="mini-field">
           <label class="mini-label">Gender</label>
