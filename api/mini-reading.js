@@ -128,12 +128,22 @@ BIRTH CHART DATA:
 - Day Pillar: ${pillars.day}
 ${specialStars ? `- Special Stars: ${specialStars}` : ''}
 
+TONE EXAMPLES (match this exact style):
+- "You say yes to everything, then quietly resent everyone for asking. Your mental spreadsheet of who owes you what is more detailed than most people's tax returns."
+- "You feel everything at 11 but present it at a steady 5, then wonder why people think you're fine when you're drowning inside."
+- "You've perfected the art of being present but emotionally unavailable."
+- "Your biggest blind spot? Assuming that if people really cared, they'd dig deeper without you giving them a shovel."
+- "You keep attracting ships in distress when what you really want is another lighthouse to keep you company."
+- "This is not the year to stay humble — your expertise deserves a platform."
+
+This is the voice. Brutally specific. Conversational. Calls out patterns they've never said out loud. Not generic motivational — it should sting a little, then feel like relief because someone finally named it.
+
 CRITICAL RULES:
-- Write like the PDF samples: "You feel everything at 11 but present it at a steady 5" level of accuracy
 - Use "you" directly — talk TO this person
 - Reference their specific element balance (e.g., "with 0% Fire, you..." or "your Earth-heavy chart...")
 - No astrology jargon. Plain, punchy English.
 - No generic statements that could apply to anyone.
+- Each section should be 2-3 sentences, punchy and specific.
 - Respond in exactly this JSON format, no other text:
 {"personality": "...", "forecast2026": "..."}`
         }]
