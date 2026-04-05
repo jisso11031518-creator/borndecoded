@@ -1218,72 +1218,50 @@ a { color: inherit; text-decoration: none; }
   letter-spacing: 0.04em;
 }
 
-/* ---- Element bars ---- */
+/* ---- Element bars (PDF style) ---- */
 .element-bars {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .element-row {
   display: flex;
-  flex-direction: column;
-  gap: 3px;
+  align-items: center;
+  gap: 10px;
 }
-
-.element-row-dominant .element-label { font-weight: 600; }
-.element-row-missing { opacity: 0.7; }
 
 .element-label {
+  width: 50px;
   font-family: var(--font-sans);
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 500;
   color: var(--brown);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.element-bar-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-shrink: 0;
 }
 
 .element-track {
   flex: 1;
-  height: 16px;
+  height: 14px;
   background: rgba(0,0,0,0.04);
-  border-radius: 8px;
+  border-radius: 4px;
   overflow: hidden;
 }
 
 .element-fill {
   height: 100%;
-  border-radius: 8px;
+  border-radius: 4px;
   transition: width 0.8s ease-out;
 }
 
 .element-pct {
-  width: 36px;
+  width: 52px;
   font-family: var(--font-sans);
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--brown);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--brown-light);
   flex-shrink: 0;
   text-align: right;
-}
-
-.element-insight {
-  font-family: var(--font-sans);
-  font-size: 0.72rem;
-  line-height: 1.3;
-  padding-left: 2px;
-}
-
-.element-insight-dominant {
-  color: var(--gold);
-  font-weight: 500;
 }
 
 .element-insight-missing {
