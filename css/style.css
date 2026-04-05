@@ -968,6 +968,15 @@ a { color: inherit; text-decoration: none; }
   text-align: center;
 }
 
+.hero-sub-value {
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  color: rgba(201,169,110,0.85);
+  text-align: center;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
 /* ---- Mini Form ---- */
 .mini-form {
   margin-top: 24px;
