@@ -84,24 +84,14 @@ document.addEventListener('DOMContentLoaded', () => {
     Water: '#4A6FA5',
   };
 
-  const ELEMENT_ICONS = {
-    Wood: '\u{1F333}',
-    Fire: '\u{1F525}',
-    Earth: '\u{26F0}\uFE0F',
-    Metal: '\u{2699}\uFE0F',
-    Water: '\u{1F4A7}',
-  };
-
   // ---- Render result card ----
   function renderResult(data) {
     const resultCard = document.getElementById('resultCard');
-    const ctaCard = document.getElementById('resultCTA');
 
-    // Day Master badge — element-colored
+    // Day Master badge — no emoji, clean text
     const dmBadge = resultCard.querySelector('.dm-badge');
     const elColor = ELEMENT_COLORS[data.dayMasterElement] || '#C9A96E';
     dmBadge.innerHTML = `
-      <span class="dm-icon-lg">${ELEMENT_ICONS[data.dayMasterElement] || ''}</span>
       <div class="dm-text">
         <span class="dm-name">${data.dayMaster}</span>
         <span class="dm-hanja-inline">${data.dayMasterHanja}</span>
@@ -113,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Name line
     resultCard.querySelector('.dm-intro').textContent = `${form.name.value.trim()}, you are`;
 
-    // Element bars — PDF style (clean, minimal)
+    // Element bars — PDF style (clean, minimal, no emoji)
     const barsContainer = resultCard.querySelector('.element-bars');
     barsContainer.innerHTML = '';
     const elements = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
@@ -135,7 +125,6 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
       barsContainer.appendChild(row);
 
-      // Animate bar after append
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           row.querySelector('.element-fill').style.width = barWidth + '%';
@@ -143,16 +132,14 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Personality & forecast
-    resultCard.querySelector('.truth-text').textContent = `"${data.personality}"`;
-    resultCard.querySelector('.forecast-text').textContent = `"${data.forecast2026}"`;
+    // Reading — single unified block
+    resultCard.querySelector('.reading-text').textContent = `"${data.reading}"`;
 
     // Show result
     loadingSection.style.display = 'none';
     resultSection.style.display = 'block';
     resultSection.classList.add('fade-in');
 
-    // Smooth scroll to result
     setTimeout(() => {
       resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
@@ -173,11 +160,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingInterval = startLoading();
     const startTime = Date.now();
 
-    // GA4: form submit
     if (typeof gtag === 'function') {
-      gtag('event', 'mini_reading_submit', {
-        form_name: 'mini_reading',
-      });
+      gtag('event', 'mini_reading_submit', { form_name: 'mini_reading' });
     }
 
     try {
@@ -201,7 +185,6 @@ document.addEventListener('DOMContentLoaded', () => {
         throw new Error(data.error || 'Something went wrong');
       }
 
-      // Ensure minimum 2s loading
       const elapsed = Date.now() - startTime;
       const remaining = Math.max(2000 - elapsed, 0);
 
@@ -209,7 +192,6 @@ document.addEventListener('DOMContentLoaded', () => {
         clearInterval(loadingInterval);
         renderResult(data);
 
-        // GA4 with source
         if (typeof gtag === 'function') {
           gtag('event', 'mini_reading_submit', {
             day_master: data.dayMaster,
@@ -223,7 +205,6 @@ document.addEventListener('DOMContentLoaded', () => {
       loadingSection.style.display = 'none';
       heroSection.style.display = 'block';
 
-      // Show error
       const errorEl = document.getElementById('miniError');
       if (errorEl) {
         errorEl.textContent = err.message || 'Something went wrong. Please try again.';

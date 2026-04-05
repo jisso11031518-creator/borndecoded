@@ -40,48 +40,18 @@ async function checkRateLimit(ip) {
   }
 }
 
-// ---- Fallback texts per Day Master ----
-const FALLBACK_TEXTS = {
-  "Yang Wood": {
-    personality: "You'd rather break than bend — and you've already broken more than you admit.",
-    forecast2026: "2026 strips away every excuse you've been hiding behind. What's left is finally yours."
-  },
-  "Yin Wood": {
-    personality: "You adapt to everyone's shape and then wonder why no one knows your real one.",
-    forecast2026: "Something you planted years ago finally breaks through the surface. Don't be modest about it."
-  },
-  "Yang Fire": {
-    personality: "You light up every room and burn through every relationship at the same speed.",
-    forecast2026: "2026 is when the right people finally see you — not your performance, but you."
-  },
-  "Yin Fire": {
-    personality: "You see through everyone but let them think they're fooling you. It's lonelier than it looks.",
-    forecast2026: "2026 brings someone — or something — that finally matches your depth. Don't flinch."
-  },
-  "Yang Earth": {
-    personality: "You carry everyone and then wonder why your back hurts.",
-    forecast2026: "2026 is when 'being the rock' stops being a compliment and starts being a choice."
-  },
-  "Yin Earth": {
-    personality: "You say yes to everything, then quietly resent everyone for asking.",
-    forecast2026: "2026 tests whether you can receive as well as you give. Spoiler: it's harder."
-  },
-  "Yang Metal": {
-    personality: "You cut through nonsense so fast that people mistake your clarity for cruelty.",
-    forecast2026: "2026 sharpens everything — your ambition, your decisions, and the consequences."
-  },
-  "Yin Metal": {
-    personality: "You look delicate and unbreakable at the same time. Both are true.",
-    forecast2026: "2026 reveals what's been hidden inside the pressure. It's worth more than you expected."
-  },
-  "Yang Water": {
-    personality: "You flow around every obstacle but never stop long enough to call anywhere home.",
-    forecast2026: "2026 is when the current finally has a direction. Stop swimming in circles."
-  },
-  "Yin Water": {
-    personality: "You feel everything at 11 but present it at a steady 5. Then wonder why no one checks on you.",
-    forecast2026: "2026: what you've been quietly carrying gets witnessed. Finally."
-  }
+// ---- Fallback readings per Day Master (unified) ----
+const FALLBACK_READINGS = {
+  "Yang Wood": "You'd rather break than bend — and you've already broken more than you admit. People see confidence; you know it's stubbornness dressed up nice. 2026 strips away every excuse you've been hiding behind. The things you've been 'about to start' for years? This is the year they either happen or you finally admit they won't. What's left after that honesty is finally, completely yours.",
+  "Yin Wood": "You adapt to everyone's shape and then wonder why no one knows your real one. You've become so good at reading rooms that you forgot you're allowed to change them. 2026 forces something you planted years ago to finally break through the surface. Stop being modest about what's emerging — the people who matter can already see it.",
+  "Yang Fire": "You light up every room and burn through every relationship at the same speed. The performance is flawless; the loneliness behind it is the part no one talks about. 2026 is when the right people finally see you — not the show, not the energy, but the actual you sitting quietly behind all that fire. Let them.",
+  "Yin Fire": "You see through everyone but let them think they're fooling you. It's lonelier than it looks, carrying that much insight and pretending you don't. 2026 brings someone — or something — that finally matches your depth. The temptation will be to flinch. Don't. This one is real.",
+  "Yang Earth": "You carry everyone and then wonder why your back hurts. Your chart screams 'reliable,' and you've turned that into a cage you built yourself. 2026 is when 'being the rock' stops being a compliment and starts being a choice. You're allowed to put yourself down. The people worth keeping will still be there.",
+  "Yin Earth": "You say yes to everything, then quietly resent everyone for asking. Your mental spreadsheet of who owes you what is more detailed than most people's tax returns. 2026 tests whether you can receive as well as you give. Spoiler: it's harder than any favor you've ever done. But it's the only way out of the cycle.",
+  "Yang Metal": "You cut through nonsense so fast that people mistake your clarity for cruelty. You're not cold — you just refuse to pretend confusion is the same as kindness. 2026 sharpens everything — your ambition, your decisions, and the consequences. The shortcuts you've been tolerating get exposed. Good. You work better without them.",
+  "Yin Metal": "You look delicate and unbreakable at the same time. Both are true, and you're exhausted from holding that contradiction together. 2026 reveals what's been hidden inside all that pressure. Like a diamond that forgot it used to be coal — it's worth more than you expected, and it's time to stop apologizing for your edges.",
+  "Yang Water": "You flow around every obstacle but never stop long enough to call anywhere home. People think you're adventurous; you know it's just that staying still feels like drowning. 2026 is when the current finally has a direction. Stop swimming in circles — the place you've been avoiding is exactly where you need to land.",
+  "Yin Water": "You feel everything at 11 but present it at a steady 5, then wonder why people think you're fine when you're drowning inside. Your intuition is almost supernatural, but you use it to help everyone except yourself. 2026 finally forces what you've been quietly carrying into the light. It's not exposure — it's relief."
 };
 
 // ---- Claude API call ----
@@ -112,11 +82,13 @@ async function generateWithClaude(name, dayMaster, dayMasterHanja, elementData, 
         max_tokens: 500,
         messages: [{
           role: "user",
-          content: `You are a Korean Saju (Four Pillars) reader. Based on the birth chart data below, write TWO things:
+          content: `You are a Korean Saju (Four Pillars) reader writing a free mini reading. Based on the birth chart data below, write ONE unified reading paragraph.
 
-1. PERSONALITY (2-3 sentences): A gut-punch accurate personality insight. Tone: brutally honest but empathetic. Like you're calling them out on something they've never told anyone. Short, punchy, conversational English. No fluff, no generic statements. Must feel like "how did you know that?" Maximum 40 words.
-
-2. FORECAST_2026 (2-3 sentences): What 2026 specifically brings for this person based on their chart. Tone: same as above — specific, slightly uncomfortable truth mixed with genuine hope. Not generic "good things are coming." Maximum 40 words.
+STRUCTURE (5-6 sentences, max 120 words, one flowing paragraph):
+1. Open with a gut-punch personality insight based on their element balance
+2. Transition to what 2026's energy specifically brings for them
+3. Name one thing to watch out for
+4. End with a line that feels like relief — someone finally named it
 
 BIRTH CHART DATA:
 - Name: ${name}
@@ -129,12 +101,10 @@ BIRTH CHART DATA:
 ${specialStars ? `- Special Stars: ${specialStars}` : ''}
 
 TONE EXAMPLES (match this exact style):
-- "You say yes to everything, then quietly resent everyone for asking. Your mental spreadsheet of who owes you what is more detailed than most people's tax returns."
+- "You say yes to everything, then quietly resent everyone for asking."
 - "You feel everything at 11 but present it at a steady 5, then wonder why people think you're fine when you're drowning inside."
-- "You've perfected the art of being present but emotionally unavailable."
 - "Your biggest blind spot? Assuming that if people really cared, they'd dig deeper without you giving them a shovel."
 - "You keep attracting ships in distress when what you really want is another lighthouse to keep you company."
-- "This is not the year to stay humble — your expertise deserves a platform."
 
 This is the voice. Brutally specific. Conversational. Calls out patterns they've never said out loud. Not generic motivational — it should sting a little, then feel like relief because someone finally named it.
 
@@ -143,9 +113,9 @@ CRITICAL RULES:
 - Reference their specific element balance (e.g., "with 0% Fire, you..." or "your Earth-heavy chart...")
 - No astrology jargon. Plain, punchy English.
 - No generic statements that could apply to anyone.
-- Each section should be 2-3 sentences, punchy and specific.
+- One continuous paragraph, not bullet points.
 - Respond in exactly this JSON format, no other text:
-{"personality": "...", "forecast2026": "..."}`
+{"reading": "..."}`
         }]
       })
     });
@@ -163,7 +133,7 @@ CRITICAL RULES:
     if (!jsonMatch) return null;
 
     const parsed = JSON.parse(jsonMatch[0]);
-    if (parsed.personality && parsed.forecast2026) {
+    if (parsed.reading) {
       return parsed;
     }
     return null;
@@ -264,9 +234,8 @@ export default async function handler(req, res) {
       elementDistribution, pillarLabels, specialStars
     );
 
-    const fallback = FALLBACK_TEXTS[dayMaster] || FALLBACK_TEXTS["Yin Water"];
-    const personality = aiResult?.personality || fallback.personality;
-    const forecast2026 = aiResult?.forecast2026 || fallback.forecast2026;
+    const fallback = FALLBACK_READINGS[dayMaster] || FALLBACK_READINGS["Yin Water"];
+    const reading = aiResult?.reading || fallback;
 
     return res.status(200).json({
       success: true,
@@ -276,8 +245,7 @@ export default async function handler(req, res) {
       dayMasterYinYang,
       elementDistribution,
       missingElements,
-      personality,
-      forecast2026,
+      reading,
       source: aiResult ? 'ai' : 'fallback',
     });
 
