@@ -108,6 +108,8 @@ TONE EXAMPLES (match this exact style):
 
 This is the voice. Brutally specific. Conversational. Calls out patterns they've never said out loud. Not generic motivational — it should sting a little, then feel like relief because someone finally named it.
 
+IMPORTANT: The tone examples above are for STYLE REFERENCE ONLY. Do NOT copy or closely paraphrase these exact sentences. Write completely original sentences that match the same energy and specificity level. Every reading must be unique.
+
 CRITICAL RULES:
 - Use "you" directly — talk TO this person
 - Reference their specific element balance (e.g., "with 0% Fire, you..." or "your Earth-heavy chart...")
